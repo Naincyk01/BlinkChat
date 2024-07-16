@@ -3,7 +3,7 @@ import { apiError } from "../utils/apiError.js";
 import { User } from "../models/user.model.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
+// import mongoose from "mongoose";
 
 
 const generateAccessAndRefereshTokens = async (userId) => {
@@ -95,7 +95,7 @@ const registerUser = asyncHandler(async(req,res)=>{
     if (!profileLocalPath) {
     throw new apiError(400, "Profilepic file is required");
     }
-    
+
     const profile = await uploadOnCloudinary(profileLocalPath);
     if(!profile){
     throw new apiError(400,"Error while uploading the profilepic")
@@ -103,7 +103,7 @@ const registerUser = asyncHandler(async(req,res)=>{
 
     const user = await User.create({
     fullName,
-    profilepic: profile?.url || "",
+    profilepic: profile?.url || '',
     email,
     bio,
     password,
@@ -121,3 +121,7 @@ const registerUser = asyncHandler(async(req,res)=>{
 
 });
 
+export { registerUser,
+    refreshAccessToken,
+    generateAccessAndRefereshTokens,
+ };
