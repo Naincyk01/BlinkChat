@@ -196,11 +196,50 @@ const logoutUser = asyncHandler(async (req, res) => {
       .clearCookie("refreshToken", options)
       .json(new ApiResponse(200, {}, "User logged Out"));
   });
+
+const searchUsers = asyncHandler(async (req, res) => {
+    const { name, type } = req.body;
+  
+    if (!name || !type) {
+      throw new apiError(400, "Name and Type parameters are required");
+    }
+  
+    const currentUserID = req.user._id; // Assuming req.user._id contains the current user's ID
+  
+    let query = {};
+  
+    if (type === "fullName") {
+      query = {
+        $and: [
+          { _id: { $ne: currentUserID } }, // Exclude current user
+          { fullName: { $regex: name, $options: "i" } }, // Case-insensitive match on fullName
+        ],
+      };
+    } else if (type === "username") {
+      query = {
+        $and: [
+          { _id: { $ne: currentUserID } }, // Exclude current user
+          { username: { $regex: name, $options: "i" } }, // Case-insensitive match on username
+        ],
+      };
+    } else {
+      throw new apiError(400, "Invalid Type parameter. Use 'fullName' or 'username'");
+    }
+  
+    // Perform search based on the specified type
+    const users = await User.find(query).select("-password -refreshToken"); // Exclude sensitive data
+  
+    return res.status(200).json({
+      status: "success",
+      data: users,
+    });
+  });
   
 
 export { registerUser,
     loginUser,
     logoutUser,
+    searchUsers,
     refreshAccessToken,
     generateAccessAndRefereshTokens,
  };
