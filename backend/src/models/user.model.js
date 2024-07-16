@@ -29,9 +29,8 @@ const userSchema = new Schema(
       type: String,
       required:[true, "Password is required"],
     },
-    avatar: {
+    profilepic: {
       type: String,
-      default: 'default_avatar.jpg', // Default avatar URL
     },
     online: {
       type: Boolean,
