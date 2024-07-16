@@ -194,46 +194,58 @@ const logoutUser = asyncHandler(async (req, res) => {
       .status(200)
       .clearCookie("accessToken", options)
       .clearCookie("refreshToken", options)
-      .json(new ApiResponse(200, {}, "User logged Out"));
+      .json(new apiResponse(200, {}, "User logged Out"));
   });
 
 const searchUsers = asyncHandler(async (req, res) => {
-    const { name, type } = req.body;
+    const { searchTerm } = req.body;
+
   
-    if (!name || !type) {
-      throw new apiError(400, "Name and Type parameters are required");
+    if (!searchTerm) {
+      throw new apiError(400, "Search term parameter is required");
     }
   
     const currentUserID = req.user._id; // Assuming req.user._id contains the current user's ID
   
     let query = {};
   
-    if (type === "fullName") {
+    if (searchTerm.includes("@")) {
       query = {
         $and: [
           { _id: { $ne: currentUserID } }, // Exclude current user
-          { fullName: { $regex: name, $options: "i" } }, // Case-insensitive match on fullName
-        ],
-      };
-    } else if (type === "username") {
-      query = {
-        $and: [
-          { _id: { $ne: currentUserID } }, // Exclude current user
-          { username: { $regex: name, $options: "i" } }, // Case-insensitive match on username
+          { email: searchTerm },
         ],
       };
     } else {
-      throw new apiError(400, "Invalid Type parameter. Use 'fullName' or 'username'");
+      query = {
+        $and: [
+          { _id: { $ne: currentUserID } }, // Exclude current user
+          { $or: [
+            { username: { $regex: searchTerm, $options: "i" } }, // Case-insensitive match on username
+            { fullName: { $regex: searchTerm, $options: "i" } }, // Case-insensitive match on fullName
+          ]}
+        ],
+      };
     }
   
     // Perform search based on the specified type
     const users = await User.find(query).select("-password -refreshToken"); // Exclude sensitive data
+  
+    if (users.length === 0) {
+      return res.status(404).json({
+        status: "success",
+        message: "No users found matching the search term",
+        data: [],
+      });
+    }
   
     return res.status(200).json({
       status: "success",
       data: users,
     });
   });
+  
+
   
 
 export { registerUser,

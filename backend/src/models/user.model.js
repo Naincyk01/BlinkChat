@@ -54,23 +54,17 @@ const userSchema = new Schema(
 
 
 // Hash password before saving to database
-userSchema.pre('save', async function(next) {
-    try {
-      if (!this.isModified('password')) {
-        return next();
-      }
-      const hashedPassword = await bcrypt.hash(this.password, 10);
-      this.password = hashedPassword;
-      return next();
-    } catch (error) {
-      return next(error);
-    }
-  });
-  
-  // Method to compare passwords
-  userSchema.methods.comparePassword = async function(candidatePassword) {
-    return bcrypt.compare(candidatePassword, this.password);
-  };
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+
+// Method to compare passwords
+userSchema.methods.isPasswordCorrect = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
   
   // Method to generate access token
   userSchema.methods.generateAccessToken = function() {
