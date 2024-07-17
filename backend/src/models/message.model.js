@@ -1,8 +1,9 @@
+import mongoose, { Schema } from "mongoose";
 const messageSchema = new Schema(
   {
-    conversationId: {
+    groupId: {
       type: Schema.Types.ObjectId,
-      ref: 'Conversation',
+      ref: 'Group',
       required: true,
     },
     sender: {
@@ -16,41 +17,20 @@ const messageSchema = new Schema(
     },
     type: {
       type: String,
-      enum: ['text', 'image', 'file'], 
+      enum: ['text', 'image', 'file', 'pdf'],
       required: true,
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now,
     },
     isRead: {
       type: Boolean,
       default: false,
     },
-    attachments: [{
-      filename: String,
-      url: String,
-      type: String,
-    }],
-    editedAt: {
-      type: Date,
-      default: null,
-    },
-    deleted: {
-      type: Boolean,
-      default: false,
-    },
-    mentions: [{
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-    }],
-    reactions: [{
-      emoji: String,
-      users: [{
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-      }],
-    }],
+    fileUrl: {
+      type: String  // URL or path to the file (if messageType is 'file', 'image', etc.)
+    }
   },
   { timestamps: true }
 );
+
+const Message = mongoose.model('Message', messageSchema);
+
+export { Message };

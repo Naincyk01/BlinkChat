@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const conversationSchema = new Schema(
+const groupSchema = new Schema(
   {
     name: {
       type: String,
@@ -8,7 +8,7 @@ const conversationSchema = new Schema(
     },
     type: {
       type: String,
-      enum: ['direct', 'group'],
+      enum: ['one_to_one', 'group'],
       required: true,
     },
     participants: [{
@@ -33,6 +33,6 @@ const conversationSchema = new Schema(
   { timestamps: true }
 );
 
-const Conversation = mongoose.model('Conversation', conversationSchema);
+const Group = mongoose.model('Group', groupSchema);
 
-export { Conversation };
+export { Group };
