@@ -46,17 +46,81 @@ const getConversations = asyncHandler(async (req, res) => {
 
 
 const addParticipants = asyncHandler(async (req, res) => {
+    const { groupId } = req.params;
+    const { participants } = req.body;
+    const userId = req.user._id; 
+
+    const group = await Group.findById(groupId);
+    
+    if (!group) {
+        throw new apiError(404, "Group not found");
+    }
+
+    // Check if the current user is the admin of the conversation
+    if (group.admin.toString() !== userId.toString()) {
+        throw new apiError(403, "You are not authorized to add participants to this conversation");
+    }
+
+    // Check if participants array contains valid user IDs
+    const validParticipants = await User.find({ _id: { $in: participants } });
+    if (validParticipants.length !== participants.length) {
+        throw new apiError(400, "Invalid participants provided");
+    }
+
+    // Add new participants to the conversation
+    group.participants.push(...participants);
+    await group.save();
+
+    return res.status(200).json(new apiResponse(200, group, "Participants added successfully"));
     
 });
 
 
 const removeParticipant = asyncHandler(async (req, res) => {
   
+    const { groupId, participantId } = req.params;
+    const userId = req.user._id; 
+
+    const group = await Group.findById(groupId);
+
+    if (!group) {
+        throw new apiError(404, "group not found");
+    }
+
+    // Check if the current user is the admin of the conversation
+    if (group.admin.toString() !== userId.toString()) {
+        throw new apiError(403, "You are not authorized to remove participants from this conversation");
+    }
+
+    // Remove the participant from the conversation
+    group.participants = group.participants.filter(id => id.toString() !== participantId);
+    await group.save();
+
+    return res.status(200).json(new apiResponse(200, group, "Participant removed successfully"));
+
 });
 
 
 const deleteGroup = asyncHandler(async (req, res) => {
  
+    const { conversationId } = req.params;
+    const userId = req.user._id; // Assuming req.user._id contains the current user's ID
+
+    const conversation = await Group.findById(conversationId);
+
+    if (!conversation) {
+        throw new apiError(404, "Conversation not found");
+    }
+
+    // Check if the current user is the admin of the conversation
+    if (conversation.admin.toString() !== userId.toString()) {
+        throw new apiError(403, "You are not authorized to delete this conversation");
+    }
+
+    await Group.findByIdAndDelete(groupId);
+
+    return res.status(200).json(new apiResponse(200, {}, "Conversation deleted successfully"));
+
 });
 
 export {
