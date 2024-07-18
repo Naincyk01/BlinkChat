@@ -1,16 +1,26 @@
 import express from 'express';
-import { createMessage, getMessages, deleteMessage } from '../controllers/message.controller.js';
+import { createMessage, getMessages, deleteMessage, updateMessage, markMessageAsRead, getUnreadMessagesCount } from '../controllers/message.controller.js';
 import { verifyJWT } from '../middlewares/auth.middleware.js'; 
 
 const router = express.Router();
 
+router.use(verifyJWT);
 
-router.post('/', verifyJWT, createMessage);
-
-
-router.get('/:groupId', verifyJWT, getMessages);
+router.post('/',createMessage);
 
 
-router.delete('/:messageId', verifyJWT, deleteMessage);
+router.get('/:groupId', getMessages);
+
+
+router.delete('/:messageId', deleteMessage);
+
+
+router.put('/:messageId', updateMessage);
+
+
+router.put('/mark-read/:messageId', markMessageAsRead);
+
+
+router.get('/unread-count', getUnreadMessagesCount);
 
 export default router;
