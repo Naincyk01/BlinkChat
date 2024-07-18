@@ -1,25 +1,51 @@
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { apiError } from '../utils/apiError.js';
 import { Message } from '../models/message.model.js';
-import { Group } from '../models/group.model';
+import { Group } from '../models/group.model.js';
 import { apiResponse } from '../utils/apiResponse.js';
+import {uploadOnCloudinary} from "../utils/cloudinary.js"
 
 const createMessage = asyncHandler(async (req, res) => {
-  const { groupId, content, type } = req.body;
+  const { groupId, content,type} = req.body;
   const senderId = req.user._id;
 
+  if (!groupId || !content) {
+    throw new apiError(400, "Group ID and content are required");
+  }
   const group = await Group.findById(groupId);
 
+
   // Check if group exists and if sender is a participant
-  if (!group || !group.participants.includes(senderId)) {
-    throw new apiError(404, 'Group not found or user is not a participant');
+  if (!group ) {
+    throw new apiError(404, 'Group not found ');
   }
+  if (!group.participants.includes(senderId) && group.admin.toString() !== senderId.toString()) {
+    throw new apiError(403, 'You are not authorized to send messages in this group')
+  }
+
+  let fileUrl = '';
+  if(type && ['file', 'image', 'video', 'pdf'].includes(type)){
+    const fileLocalPath = req.files?.file[0]?.path;
+    if (!fileLocalPath) {
+      throw new apiError(400, 'File upload is required for this message type');
+    }
+    const fileupload = await uploadOnCloudinary(fileLocalPath);
+  
+     if(!fileupload){
+      throw new apiError(400,"Error while uploading the file")
+      }
+      fileUrl = fileupload?.url;
+  }
+  
+
 
   const message = await Message.create({
     groupId,
     sender: senderId,
     content,
-    type,
+    type: type || 'text', // Use 'text' as default if type is not provided
+    file: fileUrl || '', // Assuming fileUrl is where the file is stored
+  
   });
 
   // Add the created message's ID to the group's messages array
@@ -41,7 +67,7 @@ const getMessages = asyncHandler(async (req, res) => {
   }
 
   // Check if the user is a participant in the group
-  if (!group.participants.includes(userId)) {
+  if (!group.participants.includes(userId) && group.admin.toString() !== userId.toString()) {
     throw new apiError(403, 'You are not authorized to view messages in this group');
   }
   // Implement pagination for messages retrieval
@@ -58,27 +84,37 @@ const deleteMessage = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
   const message = await Message.findById(messageId);
+
   if (!message) {
-    throw new apiError(404, 'Message not found');
+      throw new apiError(404, "Message not found");
   }
 
+  // Check if the user is the sender of the message or admin of the group
   const group = await Group.findById(message.groupId);
-  if (!group && !group.admin.equals(userId) && !message.sender.equals(userId)) {
-    throw new apiError(403, 'You are not authorized to delete this message');
+  if (!group) {
+      throw new apiError(404, "Group not found");
   }
 
-  await message.remove();
+  if (!message.sender.equals(userId) && !group.admin.equals(userId)) {
+      throw new apiError(403, "You are not authorized to delete this message");
+  }
 
-  // Update latestMessage in group after deletion
-  const latestMessage = await Message.findOne({ groupId: group._id })
-    .sort({ createdAt: -1 })
-    .limit(1);
+  // Delete the message using findByIdAndDelete
+  await Message.findByIdAndDelete(messageId);
 
-  group.latestMessage = latestMessage ? latestMessage._id : null;
-  await group.save();
+  // Optionally update the group's latestMessage and messages array
+  const index = group.messages.indexOf(message._id);
+  if (index !== -1) {
+      group.messages.splice(index, 1);
+      if (group.latestMessage.equals(message._id)) {
+          group.latestMessage = group.messages.length > 0 ? group.messages[group.messages.length - 1] : null;
+      }
+      await group.save();
+  }
 
-  return res.status(200).json(new apiResponse(200, {}, 'Message deleted successfully'));
+  return res.status(200).json(new apiResponse(200, {}, "Message deleted successfully"));
 });
+
 
 
 const updateMessage = asyncHandler(async (req, res) => {

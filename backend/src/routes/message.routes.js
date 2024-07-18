@@ -1,4 +1,5 @@
 import express from 'express';
+import { upload } from "../middlewares/multer.middleware.js";
 import { createMessage, getMessages, deleteMessage, updateMessage, markMessageAsRead, getUnreadMessagesCount } from '../controllers/message.controller.js';
 import { verifyJWT } from '../middlewares/auth.middleware.js'; 
 
@@ -6,7 +7,15 @@ const router = express.Router();
 
 router.use(verifyJWT);
 
-router.post('/',createMessage);
+router.route('/').post(
+    upload.fields([
+        {
+
+            name:"file",
+            maxCount: 1,
+        }
+    ]),createMessage);
+
 
 
 router.get('/:groupId', getMessages);

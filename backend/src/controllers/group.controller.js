@@ -4,26 +4,68 @@ import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
+// const createGroup = asyncHandler(async (req, res) => {
+//     const { name, participants } = req.body;
+//     const admin = req.user._id; 
+
+//     if (!name || !participants || participants.length < 1) {
+//         throw new apiError(400, "Name and participants are required");
+//     }
+
+//     // Validate if all participants exist
+//     const existingParticipants = await User.find({ _id: { $in: participants } });
+//     if (existingParticipants.length !== participants.length) {
+//         throw new apiError(400, "One or more participants do not exist");
+//     }
+
+//     const type = participants.length > 1 ? 'group' : 'one_to_one';
+
+//     const conversation = await Group.create({
+//         name,
+//         type,
+//         participants,
+//         admin,
+//     });
+
+//     if (!conversation) {
+//         throw new apiError(500, "Failed to create conversation");
+//     }
+
+  
+//     res.status(201).json(new apiResponse(201, conversation, "Conversation created successfully"));
+// });
+
+
 const createGroup = asyncHandler(async (req, res) => {
     const { name, participants } = req.body;
-    const admin = req.user._id; 
+    const admin = req.user._id;
 
     if (!name || !participants || participants.length < 1) {
         throw new apiError(400, "Name and participants are required");
     }
 
-    // Validate if all participants exist
-    const existingParticipants = await User.find({ _id: { $in: participants } });
-    if (existingParticipants.length !== participants.length) {
+
+    const participantUsers = await User.find({
+        $or: [
+            { username: { $in: participants } },
+            { fullName: { $in: participants } }
+        ]
+    });
+
+ 
+    if (participantUsers.length !== participants.length) {
         throw new apiError(400, "One or more participants do not exist");
     }
 
-    const type = participants.length > 1 ? 'group' : 'one_to_one';
+    const participantIds = participantUsers.map(user => user._id);
+
+    
+    const type = participantIds.length > 1 ? 'group' : 'one_to_one';
 
     const conversation = await Group.create({
         name,
         type,
-        participants,
+        participants: participantIds,
         admin,
     });
 
@@ -31,7 +73,6 @@ const createGroup = asyncHandler(async (req, res) => {
         throw new apiError(500, "Failed to create conversation");
     }
 
-  
     res.status(201).json(new apiResponse(201, conversation, "Conversation created successfully"));
 });
 
@@ -45,10 +86,10 @@ const getConversations = asyncHandler(async (req, res) => {
     return res.status(200).json(new apiResponse(200, conversations, "Conversations fetched successfully"));
 });
 
-
 const addParticipants = asyncHandler(async (req, res) => {
     const { groupId } = req.params;
-    const { participants } = req.body;
+    const { participants } = req.body; // participants is expected to be an array even if single participant
+
     const userId = req.user._id; 
 
     const group = await Group.findById(groupId);
@@ -57,23 +98,25 @@ const addParticipants = asyncHandler(async (req, res) => {
         throw new apiError(404, "Group not found");
     }
 
-    // Check if the current user is the admin of the conversation
+    // Check if the current user is the admin of the group
     if (group.admin.toString() !== userId.toString()) {
-        throw new apiError(403, "You are not authorized to add participants to this conversation");
+        throw new apiError(403, "You are not authorized to add participants to this group");
     }
 
+    // Convert participants to an array if it's a single ID
+    const participantsToAdd = Array.isArray(participants) ? participants : [participants];
+
     // Check if participants array contains valid user IDs
-    const validParticipants = await User.find({ _id: { $in: participants } });
-    if (validParticipants.length !== participants.length) {
+    const validParticipants = await User.find({ _id: { $in: participantsToAdd } });
+    if (validParticipants.length !== participantsToAdd.length) {
         throw new apiError(400, "Invalid participants provided");
     }
 
-    // Add new participants to the conversation
-    group.participants.push(...participants);
+    // Add new participants to the group
+    group.participants.push(...participantsToAdd);
     await group.save();
 
     return res.status(200).json(new apiResponse(200, group, "Participants added successfully"));
-    
 });
 
 
@@ -150,7 +193,7 @@ const leaveGroup = asyncHandler(async (req, res) => {
 
 const updateGroup = asyncHandler(async (req, res) => {
     const { groupId } = req.params;
-    const { name, type, participants } = req.body;
+    const { name } = req.body;
     const userId = req.user._id; 
 
     const group = await Group.findById(groupId);
@@ -166,8 +209,6 @@ const updateGroup = asyncHandler(async (req, res) => {
 
     // Update group details
     group.name = name;
-    group.type = type;
-    group.participants = participants;
     await group.save();
 
     return res.status(200).json(new apiResponse(200, group, "Conversation updated successfully"));

@@ -17,18 +17,15 @@ router.use(verifyJWT);
 
 
 router.post('/', createGroup);
-
-
-router.get('/', getConversations);
-
+router.put('/:groupId', updateGroup);
 router.put('/:groupId/participants', addParticipants);
-
 router.delete('/:groupId/participants/:participantId', removeParticipant);
-
 router.delete('/:groupId', deleteGroup);
 
-router.put('/:groupId', updateGroup);
+
+
 
 router.delete('/:groupId/leave', leaveGroup);
+router.get('/', getConversations);
 
 export default router;

@@ -17,14 +17,14 @@ const messageSchema = new Schema(
     },
     type: {
       type: String,
-      enum: ['text', 'image', 'file', 'pdf'],
+      enum: ['text', 'video', 'image', 'file', 'pdf'],
       required: true,
     },
     isRead: {
       type: Boolean,
       default: false,
     },
-    fileUrl: {
+    file: {
       type: String  // URL or path to the file (if messageType is 'file', 'image', etc.)
     }
   },
