@@ -5,11 +5,11 @@ import { apiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 const createGroup = asyncHandler(async (req, res) => {
-    const { name, type, participants } = req.body;
+    const { name, participants } = req.body;
     const admin = req.user._id; 
 
-    if (!name || !type || !participants) {
-        throw new apiError(400, "All fields (name, type, participants) are required");
+    if (!name || !participants || participants.length < 1) {
+        throw new apiError(400, "Name and participants are required");
     }
 
     // Validate if all participants exist
@@ -18,6 +18,7 @@ const createGroup = asyncHandler(async (req, res) => {
         throw new apiError(400, "One or more participants do not exist");
     }
 
+    const type = participants.length > 1 ? 'group' : 'one_to_one';
 
     const conversation = await Group.create({
         name,
@@ -103,10 +104,10 @@ const removeParticipant = asyncHandler(async (req, res) => {
 
 const deleteGroup = asyncHandler(async (req, res) => {
  
-    const { conversationId } = req.params;
+    const { groupId } = req.params;
     const userId = req.user._id; // Assuming req.user._id contains the current user's ID
 
-    const conversation = await Group.findById(conversationId);
+    const conversation = await Group.findById(groupId);
 
     if (!conversation) {
         throw new apiError(404, "Conversation not found");
@@ -123,12 +124,64 @@ const deleteGroup = asyncHandler(async (req, res) => {
 
 });
 
+
+
+const leaveGroup = asyncHandler(async (req, res) => {
+    const { groupId } = req.params;
+    const userId = req.user._id; 
+
+    const group = await Group.findById(groupId);
+
+    if (!group) {
+        throw new apiError(404, "Group not found");
+    }
+
+    // Check if the user is the admin of the group (admins cannot leave their own group)
+    if (group.admin.toString() === userId.toString()) {
+        throw new apiError(403, "Admins cannot leave their own group");
+    }
+
+    // Remove the user from the participants array
+    group.participants = group.participants.filter(id => id.toString() !== userId.toString());
+    await group.save();
+
+    return res.status(200).json(new apiResponse(200, group, "Left the group successfully"));
+});
+
+const updateGroup = asyncHandler(async (req, res) => {
+    const { groupId } = req.params;
+    const { name, type, participants } = req.body;
+    const userId = req.user._id; 
+
+    const group = await Group.findById(groupId);
+
+    if (!group) {
+        throw new apiError(404, "Group not found");
+    }
+
+    // Check if the current user is the admin of the conversation
+    if (group.admin.toString() !== userId.toString()) {
+        throw new apiError(403, "You are not authorized to update this conversation");
+    }
+
+    // Update group details
+    group.name = name;
+    group.type = type;
+    group.participants = participants;
+    await group.save();
+
+    return res.status(200).json(new apiResponse(200, group, "Conversation updated successfully"));
+});
+
+
 export {
     createGroup,
     getConversations,
     addParticipants,
     removeParticipant,
     deleteGroup,
+    leaveGroup,
+    updateGroup
 };
 
 
