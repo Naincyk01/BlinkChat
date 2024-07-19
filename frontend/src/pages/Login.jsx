@@ -6,13 +6,15 @@ import { Link } from 'react-router-dom';
 
 const Login = () => {
   const inputContainerStyles ="flex flex-col gap-2 w-full";
-  const inputStyles = "w-full h-8 rounded-md px-4 border border-[#BCBEC0] text-black text-sm";
+  const inputStyles = "w-full h-8 rounded-md px-4 text-black text-sm border-2 border-[#BCBEC0] focus:border-primaryDark focus:outline-none";
+
+  
   return (
     <div
       className="flex justify-center items-center w-full h-screen bg-cover bg-center bg-no-repeat text-white"
       style={{ backgroundImage: `url(${loginBackground})` }}
     >
-      <div className="bg-gray-400 rounded-3xl w-[450px] h-auto flex flex-col justify-center items-center shadow-md bg-clip-padding backdrop-filter backdrop-blur-lg gap-10 p-10 px-rootXPadd bg-opacity-0 border border-primary">
+      <div className="bg-gray-400 rounded-3xl w-[450px] h-auto flex flex-col justify-center items-center shadow-md bg-clip-padding backdrop-filter backdrop-blur-lg gap-10 p-5 px-rootXPadd bg-opacity-0 border border-primary">
         <button className="font-bold mr-4 drop-shadow-lg text-logoFontSize">
           <span className="">
             Blink<span className="text-primary">Chat</span>
