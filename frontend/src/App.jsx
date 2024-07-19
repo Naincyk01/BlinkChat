@@ -1,9 +1,41 @@
 import './App.css';
-import {io} from "socket.io-client";
+import { Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
+// import {io} from "socket.io-client";
+import Login from './components/Login.jsx';
+import SignIn from './components/SignIn.jsx';
 
-function App() {
-  const socket =io("http://localhost:9000")
-  return <div className="bg-green-300 h-16 border-2 border-gray-950">BlinkChat</div>;
+const AppLayout = () => {
+  return (
+    <div className="h-screen w-full">
+      <Outlet/>
+    </div>
+  );
+}
+
+const appRouter = createBrowserRouter([
+  {
+    path:"/",
+    element:<AppLayout/>,
+    children:[
+      {
+        path:"/",
+        element:<Login/>
+      },
+      {
+        path:"signin",
+        element:<SignIn/>
+      },
+    ]
+  }
+])
+
+const App = () => {
+  // const socket =io("http://localhost:9000")
+  return (
+  
+      <RouterProvider router ={appRouter}/>
+    
+  )
 }
 
 export default App;
