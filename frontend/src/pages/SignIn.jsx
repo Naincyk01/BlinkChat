@@ -14,18 +14,18 @@ const SignIn = () => {
       className="flex justify-center items-center w-full h-screen bg-cover bg-center bg-no-repeat text-white"
       style={{ backgroundImage: `url(${loginBackground})` }}
     >
-      <div className="bg-gray-400 rounded-3xl w-[450px] h-auto flex flex-col justify-center items-center shadow-md bg-clip-padding backdrop-filter backdrop-blur-lg gap-10 p-10 px-rootXPadd bg-opacity-0 border border-primary">
+      <div className="bg-gray-400 rounded-3xl w-[450px] h-auto flex flex-col justify-center items-center shadow-md bg-clip-padding backdrop-filter backdrop-blur-lg gap-3 p-4 px-rootXPadd bg-opacity-0 border border-primary">
         <button className="font-bold mr-4 drop-shadow-lg text-logoFontSize">
           <span className="">
             Blink<span className="text-primary">Chat</span>
           </span>
         </button>
 
-        <div className='flex flex-col gap-6 w-full'>
+        <div className='flex flex-col gap-4 w-full'>
 
           <div className='text-2xl font-bold text-white'>Register</div>
 
-          <form className='flex flex-col gap-6'>
+          <form className='flex flex-col gap-5'>
             <div className='flex flex-col gap-3 items-start w-full'>
             <div className={`${inputContainerStyles}`}>
                 <label className="capitalize">FullName</label>
@@ -52,21 +52,28 @@ const SignIn = () => {
                 />
               </div>
             <div className={`${inputContainerStyles}`}>
-                <label className="capitalize">username</label>
+                <label className="capitalize">Password</label>
                 <input
-                  type="text"
-                  placeholder="username@gmail.com"
+                  type="password"
+                  placeholder="password"
                   className={`${inputStyles}`}
                 />
               </div>
-              <button className='capitalize'>Forgot Password?</button>
+            <div className={`${inputContainerStyles}`}>
+                <label className="capitalize">Bio</label>
+                <input
+                  type="text"
+                  placeholder="bio"
+                  className={`${inputStyles}`}
+                />
+              </div>
             </div>
             <button className={`flex justify-center items-center text-lg font-bold bg-primary py-2 rounded-lg ${buttonHoverAnimaiton} hover:-translate-y-2 hover:bg-primaryDark`}>
-              Login
+              Sign up
             </button>
           </form>
           <span className="text-xs text-center font-light">
-            Don't Have An Account yet? <Link to='signin' className="font-bold">Sign Up</Link>
+            Already have an account? <Link to='/' className="font-bold">Login</Link>
           </span>
         </div>
       </div>

@@ -14,14 +14,14 @@ const Login = () => {
       className="flex justify-center items-center w-full h-screen bg-cover bg-center bg-no-repeat text-white"
       style={{ backgroundImage: `url(${loginBackground})` }}
     >
-      <div className="bg-gray-400 rounded-3xl w-[450px] h-auto flex flex-col justify-center items-center shadow-md bg-clip-padding backdrop-filter backdrop-blur-lg gap-10 p-5 px-rootXPadd bg-opacity-0 border border-primary">
+      <div className="bg-gray-400 rounded-3xl w-[450px] h-auto flex flex-col justify-center items-center shadow-md bg-clip-padding backdrop-filter backdrop-blur-lg gap-10 p-6 px-rootXPadd bg-opacity-0 border border-primary">
         <button className="font-bold mr-4 drop-shadow-lg text-logoFontSize">
           <span className="">
             Blink<span className="text-primary">Chat</span>
           </span>
         </button>
 
-        <div className='flex flex-col gap-6 w-full'>
+        <div className='flex flex-col w-full gap-6'>
 
           <div className='text-2xl font-bold text-white'>Login to your account</div>
 
