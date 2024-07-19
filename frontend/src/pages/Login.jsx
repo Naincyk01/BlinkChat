@@ -12,16 +12,16 @@ const Login = () => {
       className="flex justify-center items-center w-full h-screen bg-cover bg-center bg-no-repeat text-white"
       style={{ backgroundImage: `url(${loginBackground})` }}
     >
-      <div className="bg-gray-400 rounded-3xl w-[450px] h-auto flex flex-col justify-center items-center shadow-md bg-clip-padding backdrop-filter backdrop-blur-lg gap-10 p-10 px-rootXPadd bg-opacity-0 border">
+      <div className="bg-gray-400 rounded-3xl w-[450px] h-auto flex flex-col justify-center items-center shadow-md bg-clip-padding backdrop-filter backdrop-blur-lg gap-10 p-10 px-rootXPadd bg-opacity-0 border border-primary">
         <button className="font-bold mr-4 drop-shadow-lg text-logoFontSize">
           <span className="">
-            Blink<span className="text-primaryLight">Chat</span>
+            Blink<span className="text-primary">Chat</span>
           </span>
         </button>
 
         <div className='flex flex-col gap-6 w-full'>
 
-          <div className='text-2xl font-bold text-white'>Login</div>
+          <div className='text-2xl font-bold text-white'>Login to your account</div>
 
           <form className='flex flex-col gap-6'>
             <div className='flex flex-col gap-3 items-start w-full'>
@@ -37,13 +37,15 @@ const Login = () => {
                 <label className="capitalize">Password</label>
                 <input
                   type="password"
-                  placeholder="username@gmail.com"
+                  placeholder="Enter your password"
                   className={`${inputStyles}`}
                 />
               </div>
               <button className='capitalize'>Forgot Password?</button>
             </div>
-            <button className=''></button>
+            <button className={`flex justify-center items-center text-lg font-bold bg-primary py-2 rounded-lg ${buttonHoverAnimaiton} hover:-translate-y-2 hover:bg-primaryDark`}>
+              Login
+            </button>
           </form>
           <span className="text-xs text-center font-light">
             Don't Have An Account yet? <Link to='signin' className="font-bold">Sign Up</Link>

@@ -7,20 +7,25 @@ export default {
   theme: {
     extend: {
       borderColor:{
-        primary:'1A66FF',
-        primaryLight:'194185',
+        primary:'#1A66FF',
+        primaryLight:'#194185',
+        primaryDark:'#004BE1'
 
       },
       color:{
-        primary:'1A66FF',
-        primaryLight:'194185',
+        primary:'#1A66FF',
+        primaryLight:'#194185',
+         primaryDark:'#004BE1'
       },
       backgroundColor:{
-            primary:'1A66FF'
+            primary:'#1A66FF',
+            primaryLight:'#194185',
+             primaryDark:'#004BE1'
       },
       textColor:{
-        primary:'1A66FF',
-        primaryLight:'194185',
+        primary:'#1A66FF',
+        primaryLight:'#194185',
+         primaryDark:'#004BE1'
       },
       fontSize: {
         md: '16px',
