@@ -1,8 +1,8 @@
 import './App.css';
 import { Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
 // import {io} from "socket.io-client";
-import Login from './components/Login.jsx';
-import SignIn from './components/SignIn.jsx';
+import Login from './pages/Login.jsx';
+import SignIn from './pages/SignIn.jsx';
 
 const AppLayout = () => {
   return (
