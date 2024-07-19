@@ -22,6 +22,13 @@ app.use(express.static("public"));
 
 
 
+app.get('/', (_, res) => {
+  res.send('WELCOME');
+});
+
+
+
+
 //http://localhost:9000/api/v1/users/register
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/groups", groupRouter);
