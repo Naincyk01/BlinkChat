@@ -1,5 +1,5 @@
 import React from 'react';
-
+import RegisteredUserDisplay from '../messageskeleton/RegisteredUserDisplay.jsx';
 const SideBar = () => {
   const inputStyles =
     'w-full h-10 rounded-xl px-4 text-black text-sm border border-[#BCBEC0] focus:border-primaryDark focus:outline-none bg-[#0D0D0D] text-sm';
@@ -41,9 +41,20 @@ const SideBar = () => {
           <input type="text" className={`${inputStyles}`} placeholder="Search users..." />
         </div>
 
-        <div className="flex flex-col gap-4 ">
-          <div className="bg-[#0D0D0D] rounded-md h-[247px] pl-4 shadow-md border">Groups</div>
-          <div className="bg-[#0D0D0D] rounded-md h-[269px] pl-4 shadow-sm border">names</div>
+       
+          <div className="bg-[#0D0D0D] rounded-md pl-4 shadow-md border h-auto overflow-y-auto">People
+           <RegisteredUserDisplay/>
+           <RegisteredUserDisplay/>
+           <RegisteredUserDisplay/>
+           <RegisteredUserDisplay/>
+           <RegisteredUserDisplay/>
+           <RegisteredUserDisplay/>
+           <RegisteredUserDisplay/>
+           <RegisteredUserDisplay/>
+           <RegisteredUserDisplay/>
+           <RegisteredUserDisplay/>
+           <RegisteredUserDisplay/>
+          {/* <div className="bg-[#0D0D0D] rounded-md h-[269px] pl-4 shadow-sm border">names</div> */}
         </div>
       </div>
     </div>
