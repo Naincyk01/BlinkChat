@@ -8,23 +8,26 @@ export default {
     extend: {
       borderColor:{
         primary:'#1A66FF',
-        primaryLight:'#194185',
+        primaryLight:'#002B81',
         primaryDark:'#004BE1'
+        //002B81
 
       },
       color:{
         primary:'#1A66FF',
-        primaryLight:'#194185',
+        primaryLight:'#002B81',
          primaryDark:'#004BE1'
       },
       backgroundColor:{
             primary:'#1A66FF',
-            primaryLight:'#194185',
-             primaryDark:'#004BE1'
+            primaryLight:'#002B81',
+             primaryDark:'#004BE1',
+             chatBg:'#212121',
+             
       },
       textColor:{
         primary:'#1A66FF',
-        primaryLight:'#194185',
+        primaryLight:'#002B81',
          primaryDark:'#004BE1'
       },
       fontSize: {

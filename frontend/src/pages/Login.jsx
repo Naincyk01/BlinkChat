@@ -50,7 +50,7 @@ const Login = () => {
             </button>
           </form>
           <span className="text-xs text-center font-light">
-            Don't Have An Account yet? <Link to='signin' className="font-bold">Sign Up</Link>
+            Don't Have An Account yet? <Link to='signup' className="font-bold">Sign Up</Link>
           </span>
         </div>
       </div>

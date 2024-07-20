@@ -2,7 +2,8 @@ import './App.css';
 import { Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
 // import {io} from "socket.io-client";
 import Login from './pages/Login.jsx';
-import SignIn from './pages/SignIn.jsx';
+import SignUp from './pages/SignUp.jsx';
+import ChatInterface from './pages/ChatInterface.jsx';
 
 const AppLayout = () => {
   return (
@@ -22,8 +23,12 @@ const appRouter = createBrowserRouter([
         element:<Login/>
       },
       {
-        path:"signin",
-        element:<SignIn/>
+        path:"signup",
+        element:<SignUp/>
+      },
+      {
+        path:"chatinterface",
+        element:<ChatInterface/>
       },
     ]
   }

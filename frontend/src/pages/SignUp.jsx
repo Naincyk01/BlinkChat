@@ -4,7 +4,7 @@ import {buttonHoverAnimaiton} from '../utils/TailwindUtlis.jsx'
 import { Link } from 'react-router-dom';
 
 
-const SignIn = () => {
+const SignUp = () => {
   const inputContainerStyles ="flex flex-col gap-2 w-full";
   const inputStyles = "w-full h-8 rounded-md px-4 text-black text-sm border-2 border-[#BCBEC0] focus:border-primaryDark focus:outline-none";
 
@@ -81,4 +81,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default SignUp;
