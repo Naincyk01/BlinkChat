@@ -92,19 +92,19 @@ const registerUser = asyncHandler(async(req,res)=>{
     }
 
     
-    const profileLocalPath = req.files?.profilepic[0]?.path;
-    if (!profileLocalPath) {
-    throw new apiError(400, "Profilepic file is required");
-    }
+    // const profileLocalPath = req.files?.profilepic[0]?.path;
+    // if (!profileLocalPath) {
+    // throw new apiError(400, "Profilepic file is required");
+    // }
 
-    const profile = await uploadOnCloudinary(profileLocalPath);
-    if(!profile){
-    throw new apiError(400,"Error while uploading the profilepic")
-    }
+    // const profile = await uploadOnCloudinary(profileLocalPath);
+    // if(!profile){
+    // throw new apiError(400,"Error while uploading the profilepic")
+    // }
 
     const user = await User.create({
     fullName,
-    profilepic: profile?.url || '',
+    // profilepic: profile?.url || '',
     email,
     bio,
     password,

@@ -38,7 +38,9 @@ const App = () => {
   // const socket =io("http://localhost:9000")
   return (
   
-      <RouterProvider router ={appRouter}/>
+    <RouterProvider router={appRouter}>
+      <AppLayout />
+    </RouterProvider>
     
   )
 }
