@@ -1,14 +1,25 @@
-import React from 'react'
+import React, { useState } from 'react';
 import Sidebar from "../components/sidebar/SideBar.jsx";
-import WorkArea from "../components/chat/WorkArea.jsx"
+import WorkArea from "../components/chat/WorkArea.jsx";
+import ChatBox from "../components/chat/ChatBox.jsx";
 
 const ChatInterface = () => {
+  const [selectedUser, setSelectedUser] = useState(null);
+
+   const handleUserClick = (user) => {
+    setSelectedUser(user);
+  };
+
   return (
     <div className='w-full h-screen flex bg-chatBg text-white'>
-      <Sidebar/>
-      <WorkArea/>
+      <Sidebar onUserClick={handleUserClick} />
+      {selectedUser ? (
+        <ChatBox selectedUser={selectedUser} />
+      ) : (
+        <WorkArea />
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default ChatInterface
+export default ChatInterface;

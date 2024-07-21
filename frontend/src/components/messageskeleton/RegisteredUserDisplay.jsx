@@ -1,8 +1,9 @@
 import React from 'react';
 
-const RegisteredUserDisplay = ({ user }) => {
+const RegisteredUserDisplay = ({ user , onClick }) => {
+ 
   return (
-    <div className="flex items-start py-4 border-b">
+    <div className="flex items-start py-4 border-b border-[#C4C4C4] border-opacity-50" onClick={onClick}>
       <div className="border h-14 rounded-full w-14"></div>
 
       <div className="flex-1 flex flex-col">

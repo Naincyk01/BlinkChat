@@ -8,7 +8,7 @@ import { GrLogout } from 'react-icons/gr';
 import { IoSettingsOutline } from 'react-icons/io5';
 import Profile from '../../assets/bglogin.png';
 
-const SideBar = () => {
+const SideBar = ({ onUserClick }) => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [error, setError] = useState(null);
@@ -83,19 +83,18 @@ const SideBar = () => {
           {/* Search Input */}
           <input
             type="text"
-            className="w-full h-10 rounded-xl px-4 border border-[#BCBEC0] focus:border-primaryDark focus:outline-none bg-[#0D0D0D] text-sm"
+            className="w-full h-10 rounded-xl px-4 border border-[#BCBEC0] focus:border-primaryDark focus:outline-none bg-[#0D0D0D] text-sm border-opacity-50"
             placeholder="Search users..."
             value={searchQuery}
             onChange={handleSearchChange}
           />
         </div>
-
-        <div className="bg-[#0D0D0D] rounded-md pl-4 shadow-md border h-auto overflow-y-auto">
+        <div className={`bg-[#0D0D0D] rounded-md pl-4 pr-4 shadow-md border border-primaryLight border-opacity-50 h-auto overflow-y-auto ${filteredUsers.length > 0 ? 'scrollbar-hidden' : ''}`}>
           <div className="text-white font-semibold px-4 py-2">People</div>
           <div className="flex flex-col gap-2">
             {error && <p>Error: {error}</p>}
             {filteredUsers.map(user => (
-              <RegisteredUserDisplay key={user._id} user={user} />
+              <RegisteredUserDisplay key={user._id} user={user}  onClick={() => onUserClick(user)} />
             ))}
           </div>
         </div>
@@ -105,3 +104,6 @@ const SideBar = () => {
 };
 
 export default SideBar;
+
+
+
