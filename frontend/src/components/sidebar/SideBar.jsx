@@ -10,22 +10,43 @@ import Profile from '../../assets/bglogin.png';
 
 const SideBar = () => {
   const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const response = await axios.get('/users/all');
-        setUsers(response.data.data); 
-        console.log(response.data.data); 
+        setUsers(response.data.data);
+        setFilteredUsers(response.data.data); // Initialize filteredUsers with all users
       } catch (error) {
         console.error('Error fetching users:', error);
-        setError(error.message); 
+        setError(error.message);
       }
     };
 
     fetchUsers();
   }, []);
+
+  // Function to handle search input change
+  const handleSearchChange = (event) => {
+    const query = event.target.value;
+    setSearchQuery(query);
+    filterUsers(query);
+  };
+
+  // Function to filter users based on search query
+  const filterUsers = (query) => {
+    if (!query) {
+      setFilteredUsers(users); // If query is empty, show all users
+    } else {
+      const filtered = users.filter(user =>
+        user.username.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredUsers(filtered);
+    }
+  };
 
   return (
     <div className="h-auto w-auto p-4 flex">
@@ -62,8 +83,10 @@ const SideBar = () => {
           {/* Search Input */}
           <input
             type="text"
-            className="w-full h-10 rounded-xl px-4 text-black border border-[#BCBEC0] focus:border-primaryDark focus:outline-none bg-[#0D0D0D] text-sm"
+            className="w-full h-10 rounded-xl px-4 border border-[#BCBEC0] focus:border-primaryDark focus:outline-none bg-[#0D0D0D] text-sm"
             placeholder="Search users..."
+            value={searchQuery}
+            onChange={handleSearchChange}
           />
         </div>
 
@@ -71,7 +94,7 @@ const SideBar = () => {
           <div className="text-white font-semibold px-4 py-2">People</div>
           <div className="flex flex-col gap-2">
             {error && <p>Error: {error}</p>}
-            {users.map(user => (
+            {filteredUsers.map(user => (
               <RegisteredUserDisplay key={user._id} user={user} />
             ))}
           </div>
