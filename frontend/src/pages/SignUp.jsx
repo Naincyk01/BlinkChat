@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import loginBackground from '../assets/bglogin.png';
-import axiosInstance from "../axiosInstance.jsx";
+import axios from "../axiosInstance.jsx";
 import {buttonHoverAnimaiton} from '../utils/TailwindUtlis.jsx'
 import { Link } from 'react-router-dom';
 
@@ -28,7 +28,7 @@ const SignUp = () => {
     e.preventDefault();
 
     try {
-      const response = await axiosInstance.post('/users/register', formData);
+      const response = await axios.post('/users/register', formData);
       console.log('Registration successful:', response.data);
     } catch (error) {
       console.error('Registration failed:', error);

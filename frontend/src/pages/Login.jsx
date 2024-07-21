@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import loginBackground from '../assets/bglogin.png';
-import axiosInstance from "../axiosInstance.jsx"; 
+import axios from "../axiosInstance.jsx"; 
 import { buttonHoverAnimaiton } from '../utils/TailwindUtlis.jsx'; 
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -27,7 +27,7 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await axiosInstance.post('/users/login', formData);
+      const response = await axios.post('/users/login', formData);
       console.log('Login successful:', response.data);
       navigate('/chatinterface');
     } catch (error) {
