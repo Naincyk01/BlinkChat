@@ -30,10 +30,8 @@ const SignUp = () => {
     try {
       const response = await axiosInstance.post('/users/register', formData);
       console.log('Registration successful:', response.data);
-      // Optionally redirect to login page or handle success
     } catch (error) {
       console.error('Registration failed:', error);
-      // Handle error state or display error message to user
     }
   };
 

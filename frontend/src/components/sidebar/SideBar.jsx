@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import RegisteredUserDisplay from '../messageskeleton/RegisteredUserDisplay.jsx';
-const SideBar = () => {
-  const inputStyles =
-    'w-full h-10 rounded-xl px-4 text-black text-sm border border-[#BCBEC0] focus:border-primaryDark focus:outline-none bg-[#0D0D0D] text-sm';
 
-  const inputContainerStyles = 'w-full';
+const SideBar = () => {
+  
+const inputStyles ='w-full h-10 rounded-xl px-4 text-black text-sm border border-[#BCBEC0] focus:border-primaryDark focus:outline-none bg-[#0D0D0D] text-sm';
+const inputContainerStyles = 'w-full';
   return (
     <div className="h-auto w-auto p-4 flex">
       {/* Side Bar */}
@@ -38,22 +39,13 @@ const SideBar = () => {
       <div className="w-[350px] h-full flex flex-col pl-6 gap-6">
         <div className={`${inputContainerStyles}`}>
           {/* Search Input */}
-          <input type="text" className={`${inputStyles}`} placeholder="Search users..." />
+          <input type="text" className={`${inputStyles}`} placeholder="Search users..."/>
         </div>
 
        
-          <div className="bg-[#0D0D0D] rounded-md pl-4 shadow-md border h-auto overflow-y-auto">People
-           <RegisteredUserDisplay/>
-           <RegisteredUserDisplay/>
-           <RegisteredUserDisplay/>
-           <RegisteredUserDisplay/>
-           <RegisteredUserDisplay/>
-           <RegisteredUserDisplay/>
-           <RegisteredUserDisplay/>
-           <RegisteredUserDisplay/>
-           <RegisteredUserDisplay/>
-           <RegisteredUserDisplay/>
-           <RegisteredUserDisplay/>
+          <div className="bg-[#0D0D0D] rounded-md pl-4 shadow-md border h-auto overflow-y-auto"> 
+          <div className="text-white font-semibold px-4 py-2">People</div>
+              <RegisteredUserDisplay/>
           {/* <div className="bg-[#0D0D0D] rounded-md h-[269px] pl-4 shadow-sm border">names</div> */}
         </div>
       </div>
@@ -62,3 +54,4 @@ const SideBar = () => {
 };
 
 export default SideBar;
+
