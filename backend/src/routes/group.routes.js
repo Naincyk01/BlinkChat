@@ -1,6 +1,6 @@
 import express from 'express';
 import {
-  createGroup,
+  createOneToOneOrGroupSetUp,
   getConversations,
   addParticipants,
   removeParticipant,
@@ -16,7 +16,7 @@ const router = express.Router();
 router.use(verifyJWT);
 
 
-router.post('/', createGroup);
+router.post('/',  createOneToOneOrGroupSetUp);
 router.put('/:groupId', updateGroup);
 router.put('/:groupId/participants', addParticipants);
 router.delete('/:groupId/participants/:participantId', removeParticipant);

@@ -35,8 +35,16 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 //     res.status(201).json(new apiResponse(201, conversation, "Conversation created successfully"));
 // });
 
+// const getConversations = asyncHandler(async (req, res) => {
+//     const userId = req.user._id; 
+//     const conversations = await Group.find({ participants: userId })
+//         .populate('participants', 'fullName profilepic') 
+//         .populate('latestMessage', 'content createdAt'); 
 
-const createGroup = asyncHandler(async (req, res) => {
+//     return res.status(200).json(new apiResponse(200, conversations, "Conversations fetched successfully"));
+// });
+
+const createOneToOneOrGroupSetUp = asyncHandler(async (req, res) => {
     const { name, participants } = req.body;
     const admin = req.user._id;
 
@@ -77,14 +85,6 @@ const createGroup = asyncHandler(async (req, res) => {
 });
 
 
-const getConversations = asyncHandler(async (req, res) => {
-    const userId = req.user._id; 
-    const conversations = await Group.find({ participants: userId })
-        .populate('participants', 'fullName profilepic') 
-        .populate('latestMessage', 'content createdAt'); 
-
-    return res.status(200).json(new apiResponse(200, conversations, "Conversations fetched successfully"));
-});
 
 const addParticipants = asyncHandler(async (req, res) => {
     const { groupId } = req.params;
@@ -214,9 +214,39 @@ const updateGroup = asyncHandler(async (req, res) => {
     return res.status(200).json(new apiResponse(200, group, "Conversation updated successfully"));
 });
 
+const getConversations = asyncHandler(async (req, res) => {
+    const userId = req.user._id;
+    
+    // Find all groups where the user is either a participant or an admin
+    const groups = await Group.find({
+        $or: [
+            { participants: userId },
+            { admin: userId }
+        ]
+    })
+    .populate('participants') // Remove specific fields to just populate participants
+    .populate('latestMessage', 'content createdAt');
+
+    // Transform groups to include type and participants
+    const transformedGroups = groups.map(group => ({
+        _id: group._id,
+        name: group.name,
+        type: group.type,
+        participants: group.participants.map(participant => ({
+            _id: participant._id
+            // Optionally, you can include other fields like participant.username if needed
+        })),
+        latestMessage: group.latestMessage,
+        createdAt: group.createdAt,
+        updatedAt: group.updatedAt
+    }));
+
+    return res.status(200).json(new apiResponse(200, transformedGroups, "Groups fetched successfully"));
+});
+
 
 export {
-    createGroup,
+    createOneToOneOrGroupSetUp,
     getConversations,
     addParticipants,
     removeParticipant,

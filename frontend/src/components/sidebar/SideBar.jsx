@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from '../../axiosInstance.jsx';
-import RegisteredUserDisplay from '../messageskeleton/RegisteredUserDisplay.jsx';
+import UserToChatDisplay from '../messageskeleton/UserToChatDisplay.jsx';
 import { IoHomeOutline } from 'react-icons/io5';
 import { IoMdNotificationsOutline } from 'react-icons/io';
 import { AiOutlineMessage } from 'react-icons/ai';
@@ -17,7 +17,8 @@ const SideBar = ({ onUserClick }) => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('/users/all');
+        const response = await axios.get('/groups/');
+        console.log(response.data);
         setUsers(response.data.data);
         setFilteredUsers(response.data.data); // Initialize filteredUsers with all users
       } catch (error) {
@@ -94,7 +95,7 @@ const SideBar = ({ onUserClick }) => {
           <div className="flex flex-col gap-2">
             {error && <p>Error: {error}</p>}
             {filteredUsers.map(user => (
-              <RegisteredUserDisplay key={user._id} user={user}  onClick={() => onUserClick(user)} />
+              <UserToChatDisplay key={user._id} user={user}  onClick={() => onUserClick(user)} />
             ))}
           </div>
         </div>

@@ -2,59 +2,131 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { apiError } from '../utils/apiError.js';
 import { Message } from '../models/message.model.js';
 import { Group } from '../models/group.model.js';
+import { User } from '../models/user.model.js';
 import { apiResponse } from '../utils/apiResponse.js';
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
 
+
 const createMessage = asyncHandler(async (req, res) => {
-  const { groupId, content,type} = req.body;
+  const { groupId, content, type } = req.body;
   const senderId = req.user._id;
 
   if (!groupId || !content) {
-    throw new apiError(400, "Group ID and content are required");
+      throw new apiError(400, "Group ID and content are required");
   }
+
   const group = await Group.findById(groupId);
 
-
-  // Check if group exists and if sender is a participant
-  if (!group ) {
-    throw new apiError(404, 'Group not found ');
+  // Check if group exists
+  if (!group) {
+      throw new apiError(404, 'Group not found');
   }
+
+  // Check if sender is a participant or admin of the group
   if (!group.participants.includes(senderId) && group.admin.toString() !== senderId.toString()) {
-    throw new apiError(403, 'You are not authorized to send messages in this group')
+      throw new apiError(403, 'You are not authorized to send messages in this group');
   }
 
   let fileUrl = '';
-  if(type && ['file', 'image', 'video', 'pdf'].includes(type)){
-    const fileLocalPath = req.files?.file[0]?.path;
-    if (!fileLocalPath) {
-      throw new apiError(400, 'File upload is required for this message type');
-    }
-    const fileupload = await uploadOnCloudinary(fileLocalPath);
-  
-     if(!fileupload){
-      throw new apiError(400,"Error while uploading the file")
+  if (type && ['file', 'image', 'video', 'pdf'].includes(type)) {
+      const fileLocalPath = req.files?.file[0]?.path;
+      if (!fileLocalPath) {
+          throw new apiError(400, 'File upload is required for this message type');
       }
-      fileUrl = fileupload?.url;
-  }
-  
+      const fileupload = await uploadOnCloudinary(fileLocalPath);
 
+      if (!fileupload) {
+          throw new apiError(400, "Error while uploading the file");
+      }
+      fileUrl = fileupload.url;
+  }
+
+  // Fetch sender details (fullName)
+  const sender = await User.findById(senderId, 'fullName');
 
   const message = await Message.create({
-    groupId,
-    sender: senderId,
-    content,
-    type: type || 'text', // Use 'text' as default if type is not provided
-    file: fileUrl || '', // Assuming fileUrl is where the file is stored
-  
+      groupId,
+      sender: senderId, // Store sender's ID in the message
+      content,
+      type: type || 'text', // Use 'text' as default if type is not provided
+      file: fileUrl || '', // URL or path to the file (if messageType is 'file', 'image', etc.)
   });
 
-  // Add the created message's ID to the group's messages array
+  // Update group with the latest message and add message ID to messages array
   group.latestMessage = message._id;
   group.messages.push(message._id);
   await group.save();
 
-  return res.status(201).json(new apiResponse(201, message, 'Message sent successfully'));
+  // Prepare response data including sender details
+  const responseData = {
+      _id: message._id,
+      groupId: message.groupId,
+      sender: {
+          _id: senderId,
+          fullName: sender.fullName, // Include sender's full name
+      },
+      content: message.content,
+      type: message.type,
+      file: message.file,
+      createdAt: message.createdAt,
+      updatedAt: message.updatedAt,
+  };
+
+  return res.status(201).json(new apiResponse(201, responseData, 'Message sent successfully'));
 });
+
+// const createMessage = asyncHandler(async (req, res) => {
+//   const { groupId, content,type} = req.body;
+//   const senderId = req.user._id;
+
+//   if (!groupId || !content) {
+//     throw new apiError(400, "Group ID and content are required");
+//   }
+//   const group = await Group.findById(groupId);
+
+
+//   // Check if group exists and if sender is a participant
+//   if (!group ) {
+//     throw new apiError(404, 'Group not found ');
+//   }
+//   if (!group.participants.includes(senderId) && group.admin.toString() !== senderId.toString()) {
+//     throw new apiError(403, 'You are not authorized to send messages in this group')
+//   }
+
+//   let fileUrl = '';
+//   if(type && ['file', 'image', 'video', 'pdf'].includes(type)){
+//     const fileLocalPath = req.files?.file[0]?.path;
+//     if (!fileLocalPath) {
+//       throw new apiError(400, 'File upload is required for this message type');
+//     }
+//     const fileupload = await uploadOnCloudinary(fileLocalPath);
+  
+//      if(!fileupload){
+//       throw new apiError(400,"Error while uploading the file")
+//       }
+//       fileUrl = fileupload?.url;
+//   }
+  
+
+//   const sender = await User.findById(senderId, 'fullName');
+//   const message = await Message.create({
+//     groupId,
+//     sender: {
+//         _id: senderId,
+//         fullName: sender.fullName, 
+//     },
+//     content,
+//     type: type || 'text', // Use 'text' as default if type is not provided
+//     file: fileUrl || '', // URL or path to the file (if messageType is 'file', 'image', etc.)
+// });
+
+//   // Add the created message's ID to the group's messages array
+//   group.latestMessage = message._id;
+//   group.messages.push(message._id);
+//   await group.save();
+
+//   return res.status(201).json(new apiResponse(201, message, 'Message sent successfully'));
+// });
 
 const getMessages = asyncHandler(async (req, res) => {
   const { groupId } = req.params;
