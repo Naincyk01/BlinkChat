@@ -1,6 +1,5 @@
 import './App.css';
 import { Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
-// import {io} from "socket.io-client";
 import Login from './pages/Login.jsx';
 import SignUp from './pages/SignUp.jsx';
 import ChatInterface from './pages/ChatInterface.jsx';
@@ -35,7 +34,6 @@ const appRouter = createBrowserRouter([
 ])
 
 const App = () => {
-  // const socket =io("http://localhost:9000")
   return (
   
     <RouterProvider router={appRouter}>
