@@ -1,12 +1,14 @@
 import express from 'express';
 import {
-  createOneToOneOrGroupSetUp,
-  getConversations,
+  findOneByUser,
   addParticipants,
   removeParticipant,
+  createGroupConversation,
   deleteGroup,
   updateGroup,
-  leaveGroup
+  leaveGroup,
+  createOneToOneConversation,
+  getGroupConversations
 } from '../controllers/group.controller.js';
 import { verifyJWT } from '../middlewares/auth.middleware.js'; 
 
@@ -16,7 +18,8 @@ const router = express.Router();
 router.use(verifyJWT);
 
 
-router.post('/',  createOneToOneOrGroupSetUp);
+router.post('/one',  createOneToOneConversation);
+router.post('/group',  createGroupConversation);
 router.put('/:groupId', updateGroup);
 router.put('/:groupId/participants', addParticipants);
 router.delete('/:groupId/participants/:participantId', removeParticipant);
@@ -26,6 +29,7 @@ router.delete('/:groupId', deleteGroup);
 
 
 router.delete('/:groupId/leave', leaveGroup);
-router.get('/', getConversations);
+router.get('/findone', findOneByUser );
+router.get('/findgroup',getGroupConversations);
 
 export default router;

@@ -4,7 +4,6 @@ const groupSchema = new Schema(
   {
     name: {
       type: String,
-      required: true,
     },
     type: {
       type: String,
@@ -18,7 +17,6 @@ const groupSchema = new Schema(
     admin: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
     },
     latestMessage: {
       type: Schema.Types.ObjectId,

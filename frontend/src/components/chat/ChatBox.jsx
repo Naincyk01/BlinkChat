@@ -7,14 +7,32 @@ import io from 'socket.io-client';
 
 const ChatBox = ({ selectedUser }) => {
   const id = selectedUser._id;
+  const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
   const [currentMessage, setCurrentMessage] = useState('');
 
+ 
   useEffect(() => {
-    const socket = io ("http://localhost:9000");
-  }, []);
+    const newSocket = io('http://localhost:9000'); 
+    setSocket(newSocket);
 
+    return () => newSocket.close(); 
+}, []);
 
+useEffect(() => {
+  if (!socket) return;
+
+  // Event listener for incoming messages
+  socket.on('message', (message) => {
+      setMessages([...messages, message]);
+  });
+
+  return () => {
+      socket.off('message'); // Clean up event listener
+  };
+}, [socket, messages]);
+
+ 
   const sendMessage = async () => {
     if (!currentMessage.trim()) return; // Do not send empty messages
 
@@ -27,6 +45,7 @@ const ChatBox = ({ selectedUser }) => {
       });
       
       const newMessage = response.data.data;
+      socket.emit('sendMessage', newMessage); 
       setMessages([...messages, newMessage]);
       setCurrentMessage(''); 
     } catch (error) {

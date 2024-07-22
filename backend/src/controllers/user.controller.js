@@ -244,23 +244,21 @@ const searchUsers = asyncHandler(async (req, res) => {
     });
   });
   
-  const getAllUsersExceptLoggedIn = asyncHandler(async (req, res) => {
-    const userId = req.user._id; // Assuming req.user._id contains the ID of the logged-in user
-  
-    const users = await User.find({ _id: { $ne: userId } }).select('-password -refreshToken');
+  const getAllUsers = asyncHandler(async (req, res) => {
+    const users = await User.find({}).select('-password -refreshToken');
   
     if (!users || users.length === 0) {
       throw new apiError(404, 'No users found');
     }
   
-    // Return list of users excluding the logged-in user
+    // Return list of all users
     res.status(200).json(new apiResponse(200, users, 'Users found'));
-  });
-  
+});
+
   
 
 export { registerUser,
-  getAllUsersExceptLoggedIn,
+  getAllUsers,
     loginUser,
     logoutUser,
     searchUsers,

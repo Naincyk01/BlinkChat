@@ -4,47 +4,47 @@ import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
-// const createGroup = asyncHandler(async (req, res) => {
-//     const { name, participants } = req.body;
-//     const admin = req.user._id; 
 
-//     if (!name || !participants || participants.length < 1) {
-//         throw new apiError(400, "Name and participants are required");
-//     }
+const createOneToOneConversation = asyncHandler(async (req, res) => {
+    const { participant } = req.body;
+    const admin = req.user._id;
 
-//     // Validate if all participants exist
-//     const existingParticipants = await User.find({ _id: { $in: participants } });
-//     if (existingParticipants.length !== participants.length) {
-//         throw new apiError(400, "One or more participants do not exist");
-//     }
+    if (!participant) {
+        throw new apiError(400, "Participant are required");
+    }
 
-//     const type = participants.length > 1 ? 'group' : 'one_to_one';
+    // Find the participant user
+    const participantUser = await User.findOne({
+        $or: [
+            { username: participant },
+            { fullName: participant }
+        ]
+    });
 
-//     const conversation = await Group.create({
-//         name,
-//         type,
-//         participants,
-//         admin,
-//     });
+    if (!participantUser) {
+        throw new apiError(400, "Participant does not exist");
+    }
 
-//     if (!conversation) {
-//         throw new apiError(500, "Failed to create conversation");
-//     }
+    const type = 'one_to_one';
+    const participantIds = [participantUser._id];
 
-  
-//     res.status(201).json(new apiResponse(201, conversation, "Conversation created successfully"));
-// });
+    const conversation = await Group.create({
+        type,
+        participants: participantIds,
+    });
 
-// const getConversations = asyncHandler(async (req, res) => {
-//     const userId = req.user._id; 
-//     const conversations = await Group.find({ participants: userId })
-//         .populate('participants', 'fullName profilepic') 
-//         .populate('latestMessage', 'content createdAt'); 
+    if (!conversation) {
+        throw new apiError(500, "Failed to create conversation");
+    }
 
-//     return res.status(200).json(new apiResponse(200, conversations, "Conversations fetched successfully"));
-// });
+    // Add the logged-in user as an additional participant
+    conversation.participants.push(admin);
+    await conversation.save();
 
-const createOneToOneOrGroupSetUp = asyncHandler(async (req, res) => {
+    res.status(201).json(new apiResponse(201, conversation, "One-to-one conversation created successfully"));
+});
+
+const createGroupConversation = asyncHandler(async (req, res) => {
     const { name, participants } = req.body;
     const admin = req.user._id;
 
@@ -52,7 +52,7 @@ const createOneToOneOrGroupSetUp = asyncHandler(async (req, res) => {
         throw new apiError(400, "Name and participants are required");
     }
 
-
+    // Find all participant users
     const participantUsers = await User.find({
         $or: [
             { username: { $in: participants } },
@@ -60,15 +60,17 @@ const createOneToOneOrGroupSetUp = asyncHandler(async (req, res) => {
         ]
     });
 
- 
     if (participantUsers.length !== participants.length) {
         throw new apiError(400, "One or more participants do not exist");
     }
 
+    // Map participant IDs
     const participantIds = participantUsers.map(user => user._id);
 
-    
-    const type = participantIds.length > 1 ? 'group' : 'one_to_one';
+  
+    participantIds.push(admin);
+
+    const type = 'group';
 
     const conversation = await Group.create({
         name,
@@ -81,9 +83,8 @@ const createOneToOneOrGroupSetUp = asyncHandler(async (req, res) => {
         throw new apiError(500, "Failed to create conversation");
     }
 
-    res.status(201).json(new apiResponse(201, conversation, "Conversation created successfully"));
+    res.status(201).json(new apiResponse(201, conversation, "Group conversation created successfully"));
 });
-
 
 
 const addParticipants = asyncHandler(async (req, res) => {
@@ -168,7 +169,6 @@ const deleteGroup = asyncHandler(async (req, res) => {
 });
 
 
-
 const leaveGroup = asyncHandler(async (req, res) => {
     const { groupId } = req.params;
     const userId = req.user._id; 
@@ -214,45 +214,79 @@ const updateGroup = asyncHandler(async (req, res) => {
     return res.status(200).json(new apiResponse(200, group, "Conversation updated successfully"));
 });
 
-const getConversations = asyncHandler(async (req, res) => {
-    const userId = req.user._id;
-    
-    // Find all groups where the user is either a participant or an admin
-    const groups = await Group.find({
-        $or: [
-            { participants: userId },
-            { admin: userId }
-        ]
-    })
-    .populate('participants') // Remove specific fields to just populate participants
-    .populate('latestMessage', 'content createdAt');
+const findOneByUser = asyncHandler(async (req, res) => {
+    const userId = req.user._id; // Assuming req.user._id contains the logged-in user's ID
 
-    // Transform groups to include type and participants
-    const transformedGroups = groups.map(group => ({
-        _id: group._id,
-        name: group.name,
-        type: group.type,
-        participants: group.participants.map(participant => ({
-            _id: participant._id
-            // Optionally, you can include other fields like participant.username if needed
-        })),
-        latestMessage: group.latestMessage,
-        createdAt: group.createdAt,
-        updatedAt: group.updatedAt
+    // Find Group document where the user is a participant
+    const group = await Group.findOne({
+        participants: userId
+    })
+    .populate({
+        path: 'participants',
+        select: 'fullName username lastSeen bio -_id', // Select desired fields, exclude _id
+        match: { _id: { $ne: userId } } // Exclude the logged-in user
+    })
+    .catch(err => {
+        throw new apiError(500, err.message || "Error retrieving Group data");
+    });
+
+    if (!group) {
+        throw new apiError(404, "Group data not found for the user");
+    }
+
+    // Modify participants array to include desired fields
+    const sanitizedParticipants = group.participants.map(participant => ({
+        fullName: participant.fullName,
+        username: participant.username,
+        lastSeen: participant.lastSeen,
+        bio: participant.bio
     }));
 
-    return res.status(200).json(new apiResponse(200, transformedGroups, "Groups fetched successfully"));
+    // Construct the response object with sanitized participants
+    const response = {
+        _id: group._id,
+        type: group.type,
+        participants: sanitizedParticipants,
+        latestMessage: group.latestMessage,
+        messages: group.messages,
+        createdAt: group.createdAt,
+        updatedAt: group.updatedAt,
+        __v: group.__v
+    };
+
+    // Respond with the modified Group document
+    res.status(200).json(new apiResponse(200, response, "Group data retrieved successfully"));
 });
 
 
+const getGroupConversations = asyncHandler(async (req, res) => {
+    const userId = req.user._id; // Assuming req.user._id contains the logged-in user's ID
+
+    // Find all group conversations where the user is either admin or participant
+    const groupConversations = await Group.find({
+        $or: [
+            { admin: userId }, // User is admin
+            { participants: userId } // User is participant
+        ]
+    })
+    .catch(err => {
+        throw new apiError(500, err.message || "Error retrieving group conversations");
+    });
+
+    // Respond with the retrieved group conversations
+    res.status(200).json(new apiResponse(200, groupConversations, "Group conversations retrieved successfully"));
+});
+
 export {
-    createOneToOneOrGroupSetUp,
-    getConversations,
+    createOneToOneConversation,
+    findOneByUser ,
     addParticipants,
     removeParticipant,
     deleteGroup,
     leaveGroup,
-    updateGroup
+    updateGroup,
+    createGroupConversation,
+    getGroupConversations
 };
 
 
