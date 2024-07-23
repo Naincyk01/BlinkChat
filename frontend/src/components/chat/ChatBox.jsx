@@ -1,60 +1,50 @@
-import React, { useState, useRef, useEffect } from 'react';
-import axios from "../../axiosInstance.jsx"
+import React, { useState, useEffect, useRef } from 'react';
+import axios from '../../axiosInstance.jsx';
 import io from 'socket.io-client';
 
-
-
-
 const ChatBox = ({ selectedUser }) => {
-  const id = selectedUser._id;
-  const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
   const [currentMessage, setCurrentMessage] = useState('');
+  const socketRef = useRef(null);
 
- 
   useEffect(() => {
-    const newSocket = io('http://localhost:9000'); 
-    setSocket(newSocket);
+    socketRef.current = io('http://localhost:9000');
 
-    return () => newSocket.close(); 
-}, []);
+    socketRef.current.on('connect', () => {
+      console.log('connected', socketRef.current.id);
 
-useEffect(() => {
-  if (!socket) return;
+      socketRef.current.emit('joinRoom', selectedUser._id);
 
-  // Event listener for incoming messages
-  socket.on('message', (message) => {
-      setMessages([...messages, message]);
-  });
+      socketRef.current.on('message', message => {
+        setMessages(prevMessages => [...prevMessages, message]);
+      });
+    });
 
-  return () => {
-      socket.off('message'); // Clean up event listener
-  };
-}, [socket, messages]);
+    return () => {
+      socketRef.current.disconnect();
+    };
+  }, [selectedUser._id]);
 
- 
   const sendMessage = async () => {
     if (!currentMessage.trim()) return; // Do not send empty messages
-
 
     try {
       const response = await axios.post('/messages/', {
         groupId: selectedUser._id,
         content: currentMessage,
-        type: 'text' 
+        type: 'text',
       });
-      
+
       const newMessage = response.data.data;
-      socket.emit('sendMessage', newMessage); 
+      socketRef.current.emit('message', newMessage);
       setMessages([...messages, newMessage]);
-      setCurrentMessage(''); 
+      setCurrentMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
     }
-  
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     setCurrentMessage(e.target.value);
   };
 
@@ -72,7 +62,7 @@ useEffect(() => {
 
         {/* Middle section: Display messages */}
         <div className="flex-1 overflow-y-auto mb-3 p-4">
-          {messages.map((message) => (
+          {messages.map(message => (
             <div key={message._id} className="mb-2">
               <p className="text-white">{message.content}</p>
             </div>

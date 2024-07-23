@@ -12,30 +12,38 @@ const io = new Server(server, {
   },
 });
 
-io.on('connection', (socket) => {
-  console.log('New client connected:', socket.id);
+const activeUsers = {};
 
-  // Handle disconnection
+io.on('connection', socket => {
+  console.log('User connected', socket.id);
+
+
+   socket.on('joinRoom', (room) => {
+    socket.join(room);
+    activeUsers[socket.id] = room; 
+    console.log(`User ${socket.id} joined room ${room}`);
+  });
+
+
+   socket.on('message', (message) => {
+    const room = activeUsers[socket.id];
+    if (room) {
+      // Broadcast message to all clients in the same room
+      socket.to(room).emit('message', message);
+    }
+  });
+
   socket.on('disconnect', () => {
-      console.log('Client disconnected:', socket.id);
+    const room = activeUsers[socket.id];
+    delete activeUsers[socket.id];
+    console.log(`User disconnected ${socket.id}`);
+    if (room) {
+      io.to(room).emit('userLeft', socket.id); 
+    }
   });
 
-  // Handle incoming messages
-  socket.on('sendMessage', (message) => {
-      // Broadcast the message to all participants in the group
-      io.to(message.groupId).emit('message', message);
-  });
-
-  // Join a group
-  socket.on('joinGroup', (groupId) => {
-      socket.join(groupId);
-      console.log(`Socket ${socket.id} joined group ${groupId}`);
-  });
-
-  // Leave a group
-  socket.on('leaveGroup', (groupId) => {
-      socket.leave(groupId);
-      console.log(`Socket ${socket.id} left group ${groupId}`);
+  socket.on('error', error => {
+    console.error(`Socket error: ${error.message}`);
   });
 });
 
