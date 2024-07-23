@@ -214,49 +214,78 @@ const updateGroup = asyncHandler(async (req, res) => {
     return res.status(200).json(new apiResponse(200, group, "Conversation updated successfully"));
 });
 
+
+
 const findOneByUser = asyncHandler(async (req, res) => {
-    const userId = req.user._id; // Assuming req.user._id contains the logged-in user's ID
+    const userId = req.user._id; 
 
-    // Find Group document where the user is a participant
-    const group = await Group.findOne({
-        participants: userId
-    })
-    .populate({
-        path: 'participants',
-        select: 'fullName username lastSeen bio -_id', // Select desired fields, exclude _id
-        match: { _id: { $ne: userId } } // Exclude the logged-in user
-    })
-    .catch(err => {
-        throw new apiError(500, err.message || "Error retrieving Group data");
-    });
+    const groups = await Group.aggregate([
+        {
+            $match: {
+                participants: userId
+            }
+        },
+        {
+            $lookup: {
+                from: 'users',
+                localField: 'participants',
+                foreignField: '_id',
+                as: 'participants'
+            }
+        },
+        {
+            $unwind: '$participants'
+        },
+        {
+            $match: {
+                'participants._id': { $ne: userId } // Exclude the logged-in user
+            }
+        },
+        {
+            $replaceRoot: {
+                newRoot: {
+                    $mergeObjects: [
+                        '$participants',
+                        {
+                            _id: '$_id',
+                            type: '$type',
+                            latestMessage: '$latestMessage',
+                            messages: '$messages',
+                            createdAt: '$createdAt',
+                            updatedAt: '$updatedAt',
+                            __v: '$__v'
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            $project: {
+                _id: 1,
+                type: 1,
+                fullName: '$fullName',
+                username: '$username',
+                bio: '$bio',
+                latestMessage: 1,
+                messages: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                __v: 1
+            }
+        }
+    ]);
 
-    if (!group) {
-        throw new apiError(404, "Group data not found for the user");
+    if (!groups || groups.length === 0) {
     }
 
-    // Modify participants array to include desired fields
-    const sanitizedParticipants = group.participants.map(participant => ({
-        fullName: participant.fullName,
-        username: participant.username,
-        lastSeen: participant.lastSeen,
-        bio: participant.bio
-    }));
-
-    // Construct the response object with sanitized participants
-    const response = {
-        _id: group._id,
-        type: group.type,
-        participants: sanitizedParticipants,
-        latestMessage: group.latestMessage,
-        messages: group.messages,
-        createdAt: group.createdAt,
-        updatedAt: group.updatedAt,
-        __v: group.__v
-    };
-
-    // Respond with the modified Group document
-    res.status(200).json(new apiResponse(200, response, "Group data retrieved successfully"));
+    res.status(200).json({
+        statusCode: 200,
+        data: groups,
+        message: "Group data retrieved successfully",
+        success: true
+    });
 });
+
 
 
 const getGroupConversations = asyncHandler(async (req, res) => {

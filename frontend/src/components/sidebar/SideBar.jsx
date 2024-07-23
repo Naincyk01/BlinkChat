@@ -11,19 +11,19 @@ import Profile from '../../assets/bglogin.png';
 const SideBar = ({ onUserClick }) => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('/groups/');
-        console.log(response.data);
-        setUsers(response.data.data);
-        setFilteredUsers(response.data.data); // Initialize filteredUsers with all users
+        const response = await axios.get('/groups/findone');
+        const groupData = response.data.data;
+        console.log(groupData);
+       
+        setUsers(groupData);
+        setFilteredUsers(groupData);
       } catch (error) {
         console.error('Error fetching users:', error);
-        setError(error.message);
       }
     };
 
@@ -31,19 +31,19 @@ const SideBar = ({ onUserClick }) => {
   }, []);
 
   // Function to handle search input change
-  const handleSearchChange = (event) => {
+  const handleSearchChange = event => {
     const query = event.target.value;
     setSearchQuery(query);
     filterUsers(query);
   };
 
   // Function to filter users based on search query
-  const filterUsers = (query) => {
+  const filterUsers = query => {
     if (!query) {
       setFilteredUsers(users); // If query is empty, show all users
     } else {
       const filtered = users.filter(user =>
-        user.username.toLowerCase().includes(query.toLowerCase())
+        user.username.toLowerCase().includes(query.toLowerCase()),
       );
       setFilteredUsers(filtered);
     }
@@ -90,13 +90,18 @@ const SideBar = ({ onUserClick }) => {
             onChange={handleSearchChange}
           />
         </div>
-        <div className={`bg-[#0D0D0D] rounded-md pl-4 pr-4 shadow-md border border-primaryLight border-opacity-50 h-auto overflow-y-auto ${filteredUsers.length > 0 ? 'scrollbar-hidden' : ''}`}>
+        <div
+          className={`bg-[#0D0D0D] rounded-md pl-4 pr-4 shadow-md border border-primaryLight border-opacity-50 h-auto overflow-y-auto ${filteredUsers.length > 0 ? 'scrollbar-hidden' : ''}`}
+        >
           <div className="text-white font-semibold px-4 py-2">People</div>
           <div className="flex flex-col gap-2">
-            {error && <p>Error: {error}</p>}
-            {filteredUsers.map(user => (
-              <UserToChatDisplay key={user._id} user={user}  onClick={() => onUserClick(user)} />
-            ))}
+            {Array.isArray(filteredUsers) && filteredUsers.length > 0 ? (
+              filteredUsers.map(user => (
+                <UserToChatDisplay key={user._id} user={user} onClick={() => onUserClick(user)} />
+              ))
+            ) : (
+              <p>No users found.</p>
+            )}
           </div>
         </div>
       </div>
@@ -105,6 +110,3 @@ const SideBar = ({ onUserClick }) => {
 };
 
 export default SideBar;
-
-
-

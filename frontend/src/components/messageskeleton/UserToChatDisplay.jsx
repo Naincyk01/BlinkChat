@@ -8,14 +8,14 @@ const UserToChatDisplay = ({ user , onClick }) => {
 
       <div className="flex-1 flex flex-col">
         <div className="mb-1">
-          <h3 className="text-lg font-semibold">{user.name}</h3>
+          <h3 className="text-lg font-semibold">{user.username}</h3>
           <p className="text-sm text-gray-700">{user.type}</p>
         </div>
       </div>
 
       <div className="mt-auto flex items-center flex-col">
         <div className="flex gap-x-1">
-          <div className="text-xs text-gray-500">lateteseen</div>
+          <div className="text-xs text-gray-500">{user.bio}</div>
         </div>
         <div>✅</div>
       </div>  
