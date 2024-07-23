@@ -7,7 +7,6 @@ import { apiResponse } from '../utils/apiResponse.js';
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
 
   
-
 const createMessage = asyncHandler(async (req, res) => {
   const { groupId, content, type } = req.body;
   const senderId = req.user._id;
@@ -76,59 +75,6 @@ const createMessage = asyncHandler(async (req, res) => {
   return res.status(201).json(new apiResponse(201, responseData, 'Message sent successfully'));
 });
 
-// const createMessage = asyncHandler(async (req, res) => {
-//   const { groupId, content,type} = req.body;
-//   const senderId = req.user._id;
-
-//   if (!groupId || !content) {
-//     throw new apiError(400, "Group ID and content are required");
-//   }
-//   const group = await Group.findById(groupId);
-
-
-//   // Check if group exists and if sender is a participant
-//   if (!group ) {
-//     throw new apiError(404, 'Group not found ');
-//   }
-//   if (!group.participants.includes(senderId) && group.admin.toString() !== senderId.toString()) {
-//     throw new apiError(403, 'You are not authorized to send messages in this group')
-//   }
-
-//   let fileUrl = '';
-//   if(type && ['file', 'image', 'video', 'pdf'].includes(type)){
-//     const fileLocalPath = req.files?.file[0]?.path;
-//     if (!fileLocalPath) {
-//       throw new apiError(400, 'File upload is required for this message type');
-//     }
-//     const fileupload = await uploadOnCloudinary(fileLocalPath);
-  
-//      if(!fileupload){
-//       throw new apiError(400,"Error while uploading the file")
-//       }
-//       fileUrl = fileupload?.url;
-//   }
-  
-
-//   const sender = await User.findById(senderId, 'fullName');
-//   const message = await Message.create({
-//     groupId,
-//     sender: {
-//         _id: senderId,
-//         fullName: sender.fullName, 
-//     },
-//     content,
-//     type: type || 'text', // Use 'text' as default if type is not provided
-//     file: fileUrl || '', // URL or path to the file (if messageType is 'file', 'image', etc.)
-// });
-
-//   // Add the created message's ID to the group's messages array
-//   group.latestMessage = message._id;
-//   group.messages.push(message._id);
-//   await group.save();
-
-//   return res.status(201).json(new apiResponse(201, message, 'Message sent successfully'));
-// });
-
 const getMessages = asyncHandler(async (req, res) => {
   const { groupId } = req.params;
   const userId = req.user._id; // Assuming req.user._id contains the current user's ID
@@ -146,7 +92,7 @@ const getMessages = asyncHandler(async (req, res) => {
   // Implement pagination for messages retrieval
   const messages = await Message.find({ groupId })
     .populate('sender', 'username fullName')
-    .sort({ createdAt: -1 }) // Sort by most recent first
+    .sort({ createdAt: 1 }) // Sort by most recent first
     .limit(50); // Example: Limit to 50 messages per request
 
   return res.status(200).json(new apiResponse(200, messages, 'Messages retrieved successfully'));
