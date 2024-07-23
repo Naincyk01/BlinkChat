@@ -42,7 +42,7 @@ const createMessage = asyncHandler(async (req, res) => {
   }
 
   // Fetch sender details (fullName)
-  const sender = await User.findById(senderId, 'fullName');
+  const sender = await User.findById(senderId, 'fullName username');
 
   const message = await Message.create({
       groupId,
@@ -63,7 +63,8 @@ const createMessage = asyncHandler(async (req, res) => {
       groupId: message.groupId,
       sender: {
           _id: senderId,
-          fullName: sender.fullName, // Include sender's full name
+          fullName: sender.fullName, 
+          username: sender.username,
       },
       content: message.content,
       type: message.type,
