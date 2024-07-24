@@ -261,6 +261,12 @@ const searchUsers = asyncHandler(async (req, res) => {
 
   
 
+const getCurrentUser = asyncHandler(async (req, res) => {
+  return res
+    .status(200)
+    .json(new apiResponse(200, req.user, "User fetched successfully"));
+});
+
 export { registerUser,
   getAllUsers,
     loginUser,
@@ -268,4 +274,5 @@ export { registerUser,
     searchUsers,
     refreshAccessToken,
     generateAccessAndRefereshTokens,
+    getCurrentUser
  };
