@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import loginBackground from '../assets/bglogin.png';
 import axios from "../axiosInstance.jsx";
-import {buttonHoverAnimaiton} from '../utils/TailwindUtlis.jsx'
+import { buttonHoverAnimaiton } from '../utils/TailwindUtlis.jsx';
 import { Link } from 'react-router-dom';
 
 const SignUp = () => {
@@ -10,10 +10,11 @@ const SignUp = () => {
     username: '',
     email: '',
     password: '',
-    bio: ''
+    bio: '',
+    profilepic: null  // New state for profile picture
   });
 
-  const inputContainerStyles ="flex flex-col gap-2 w-full";
+  const inputContainerStyles = "flex flex-col gap-2 w-full";
   const inputStyles = "w-full h-8 rounded-md px-4 text-black text-sm border-2 border-[#BCBEC0] focus:border-primaryDark focus:outline-none";
 
   const handleInputChange = (e) => {
@@ -24,11 +25,31 @@ const SignUp = () => {
     }));
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setFormData(prevState => ({
+      ...prevState,
+      profilepic: file
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('/users/register', formData);
+      const formDataWithFile = new FormData();
+      formDataWithFile.append('fullName', formData.fullName);
+      formDataWithFile.append('username', formData.username);
+      formDataWithFile.append('email', formData.email);
+      formDataWithFile.append('password', formData.password);
+      formDataWithFile.append('bio', formData.bio);
+      formDataWithFile.append('profilepic', formData.profilepic);
+
+      const response = await axios.post('/users/register', formDataWithFile, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       console.log('Registration successful:', response.data);
     } catch (error) {
       console.error('Registration failed:', error);
@@ -48,10 +69,9 @@ const SignUp = () => {
         </button>
 
         <div className='flex flex-col gap-4 w-full'>
-
           <div className='text-2xl font-bold text-white'>Register</div>
 
-          <form className='flex flex-col gap-5' onSubmit={handleSubmit}>
+          <form className='flex flex-col gap-5' onSubmit={handleSubmit} encType="multipart/form-data">
             <div className='flex flex-col gap-3 items-start w-full'>
               <div className={`${inputContainerStyles}`}>
                 <label className="capitalize">Full Name</label>
@@ -106,6 +126,16 @@ const SignUp = () => {
                   name="bio"
                   value={formData.bio}
                   onChange={handleInputChange}
+                />
+              </div>
+              <div className={`${inputContainerStyles}`}>
+                <label className="capitalize">Profile Picture</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className={`${inputStyles} text-white bg-primary border-opacity-50 border-primaryDark`}
+                  name="profilepic"
+                  onChange={handleFileChange}
                 />
               </div>
             </div>

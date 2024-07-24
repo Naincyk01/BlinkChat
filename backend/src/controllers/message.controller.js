@@ -6,6 +6,46 @@ import { User } from '../models/user.model.js';
 import { apiResponse } from '../utils/apiResponse.js';
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
 
+// const cleanDeletedMessagesByGroupId = async (groupId) => {
+//     try {
+//         // Find the group by groupId
+//         const group = await Group.findById(groupId);
+
+//         if (!group) {
+//             throw new apiError(404, 'Group not found');
+//         }
+
+//         // Iterate over the messages array of the group
+//         let updatedMessages = [];
+//         for (let messageId of group.messages) {
+//             // Check if the message exists
+//             const message = await Message.findById(messageId);
+//             if (message) {
+//                 updatedMessages.push(messageId); // Add message ID if it exists
+//             }
+//         }
+
+//         // Update the group's messages array with existing message IDs
+//         group.messages = updatedMessages;
+
+//         // Update latestMessage if necessary
+//         if (group.messages.length > 0) {
+//             const latestMessage = await Message.findOne({ _id: { $in: group.messages } }).sort({ createdAt: -1 });
+//             group.latestMessage = latestMessage ? latestMessage._id : null;
+//         } else {
+//             group.latestMessage = null; // No messages left, set latestMessage to null
+//         }
+
+//         // Save the updated group
+//         await group.save();
+//     } catch (error) {
+//         // Handle errors if any
+//         console.error('Error cleaning deleted messages from group:', error);
+//         throw new apiError(500, 'Failed to clean deleted messages from group');
+//     }
+// };
+
+
   
 const createMessage = asyncHandler(async (req, res) => {
   const { groupId, content, type } = req.body;
@@ -57,6 +97,7 @@ const createMessage = asyncHandler(async (req, res) => {
   group.messages.push(message._id);
   await group.save();
 
+//   await cleanDeletedMessagesByGroupId(groupId);
   // Prepare response data including sender details
   const responseData = {
       _id: message._id,

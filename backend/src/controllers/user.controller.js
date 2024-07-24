@@ -92,19 +92,24 @@ const registerUser = asyncHandler(async(req,res)=>{
     }
 
     
-    // const profileLocalPath = req.files?.profilepic[0]?.path;
-    // if (!profileLocalPath) {
-    // throw new apiError(400, "Profilepic file is required");
-    // }
+    let profileUrl = ''; 
 
-    // const profile = await uploadOnCloudinary(profileLocalPath);
-    // if(!profile){
-    // throw new apiError(400,"Error while uploading the profilepic")
-    // }
+    // Check if profile picture file is uploaded
+    if (req.files?.profilepic && req.files.profilepic.length > 0) {
+        const profileLocalPath = req.files.profilepic[0].path;
+
+        // Upload profile picture to Cloudinary
+        const profile = await uploadOnCloudinary(profileLocalPath);
+        if (!profile) {
+            throw new apiError(400, "Error while uploading the profile picture");
+        }
+
+        profileUrl = profile.url; 
+    }
 
     const user = await User.create({
     fullName,
-    // profilepic: profile?.url || '',
+    profilepic: profileUrl, 
     email,
     bio,
     password,
@@ -121,7 +126,6 @@ const registerUser = asyncHandler(async(req,res)=>{
     .json(new apiResponse(200, createdUser, "User Registered Successfully"));
 
 });
-
 
 const loginUser = asyncHandler(async (req, res) => {
     const { email, username, password } = req.body;
