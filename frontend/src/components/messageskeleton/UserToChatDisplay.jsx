@@ -1,6 +1,7 @@
 import React from 'react';
 
 const UserToChatDisplay = ({ user, onClick }) => {
+
   return (
     <div
       className="flex items-center justify-between h-full w-full py-2 mb-1 border-b border-[#C4C4C4] border-opacity-50"

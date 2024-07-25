@@ -5,7 +5,7 @@ import Image1 from '../../assets/welcomeImage1.svg';
 import Image2 from '../../assets/welcomeImage2.svg';
 
 const WorkArea = () => {
-  const text = "Connect easily with your friends and family...";
+  const text = "Connect easily with your friends and family.......";
 
  
   const image1Variants = {
