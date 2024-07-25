@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import axios from '../../axiosInstance.jsx';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate from React Router
+import { useNavigate } from 'react-router-dom'; 
 import UserToChatDisplay from '../messageskeleton/UserToChatDisplay.jsx';
 import { IoHomeOutline } from 'react-icons/io5';
 import { IoMdNotificationsOutline } from 'react-icons/io';
 import { AiOutlineMessage } from 'react-icons/ai';
 import { GrLogout } from 'react-icons/gr';
-import { IoSettingsOutline } from 'react-icons/io5';
+import { IoSettingsOutline, IoMenu } from 'react-icons/io5'; 
 import Profile from '../../assets/bglogin.png';
 
 const SideBar = ({ onUserClick }) => {
-  const navigate = useNavigate(); // Get the navigate function from React Router
+  const navigate = useNavigate(); 
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [currentUser, setCurrentUser] = useState(null); // State to hold current user information
-  const [profilePic, setProfilePic] = useState(Profile); // Default profile picture
+  const [currentUser, setCurrentUser] = useState(null);
+  const [profilePic, setProfilePic] = useState(Profile); 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true); 
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -65,24 +66,31 @@ const SideBar = ({ onUserClick }) => {
 
   const handleLogout = async () => {
     try {
-     
-      await axios.post('/users/logout'); 
+      await axios.post('/users/logout'); // Logout API call
 
+      setCurrentUser(null); // Clear current user state
+      setProfilePic(Profile); // Reset profile picture to default
       
-      setCurrentUser(null);
-      setProfilePic(Profile);
-     
-      navigate('/'); 
+      navigate('/'); // Redirect to home page after logout
     } catch (error) {
       console.error('Error logging out:', error);
     }
   };
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen); 
+  };
+
   return (
     <div className="h-auto w-auto p-4 flex">
-      <div className="bg-primary flex flex-col justify-between items-center w-[162px] rounded-lg p-4 gap-10">
+      <div
+        className={`bg-primary flex flex-col justify-between items-center w-[162px] rounded-lg p-4 gap-10 ${
+          isSidebarOpen ? '' : 'hidden'
+        }`}
+      >
         <img
           src={profilePic}
+          // src={Profile}
           alt="User Avatar"
           className="border h-20 rounded-full w-20"
         />
@@ -104,17 +112,22 @@ const SideBar = ({ onUserClick }) => {
 
         <div
           className="flex justify-center items-center p-3 rounded-lg mb-2 cursor-pointer"
-          onClick={handleLogout} // Logout onClick handler
+          onClick={handleLogout}
         >
           <GrLogout size={38} />
         </div>
       </div>
 
       <div className="w-[350px] h-full flex flex-col pl-6 gap-6">
-        <div className="w-full">
+        <div className="w-full flex justify-center items-center gap-x-2">
+          <IoMenu
+            size={30}
+            className="bg-[#0D0D0D] h-8 rounded-md border border-[#BCBEC0] border-opacity-50 cursor-pointer"
+            onClick={toggleSidebar}
+          />
           <input
             type="text"
-            className="w-full h-10 rounded-xl px-4 border border-[#BCBEC0] focus:border-primaryDark focus:outline-none bg-[#0D0D0D] text-sm border-opacity-50"
+            className="w-full h-8 rounded-md px-4 border border-[#BCBEC0] focus:border-primaryDark focus:outline-none bg-[#0D0D0D] text-sm border-opacity-50"
             placeholder="Search users..."
             value={searchQuery}
             onChange={handleSearchChange}

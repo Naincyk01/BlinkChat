@@ -6,44 +6,44 @@ import { User } from '../models/user.model.js';
 import { apiResponse } from '../utils/apiResponse.js';
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
 
-// const cleanDeletedMessagesByGroupId = async (groupId) => {
-//     try {
-//         // Find the group by groupId
-//         const group = await Group.findById(groupId);
+const cleanDeletedMessagesByGroupId = async (groupId) => {
+    try {
+        // Find the group by groupId
+        const group = await Group.findById(groupId);
 
-//         if (!group) {
-//             throw new apiError(404, 'Group not found');
-//         }
+        if (!group) {
+            throw new apiError(404, 'Group not found');
+        }
 
-//         // Iterate over the messages array of the group
-//         let updatedMessages = [];
-//         for (let messageId of group.messages) {
-//             // Check if the message exists
-//             const message = await Message.findById(messageId);
-//             if (message) {
-//                 updatedMessages.push(messageId); // Add message ID if it exists
-//             }
-//         }
+        // Iterate over the messages array of the group
+        let updatedMessages = [];
+        for (let messageId of group.messages) {
+            // Check if the message exists
+            const message = await Message.findById(messageId);
+            if (message) {
+                updatedMessages.push(messageId); // Add message ID if it exists
+            }
+        }
 
-//         // Update the group's messages array with existing message IDs
-//         group.messages = updatedMessages;
+        // Update the group's messages array with existing message IDs
+        group.messages = updatedMessages;
 
-//         // Update latestMessage if necessary
-//         if (group.messages.length > 0) {
-//             const latestMessage = await Message.findOne({ _id: { $in: group.messages } }).sort({ createdAt: -1 });
-//             group.latestMessage = latestMessage ? latestMessage._id : null;
-//         } else {
-//             group.latestMessage = null; // No messages left, set latestMessage to null
-//         }
+        // Update latestMessage if necessary
+        if (group.messages.length > 0) {
+            const latestMessage = await Message.findOne({ _id: { $in: group.messages } }).sort({ createdAt: -1 });
+            group.latestMessage = latestMessage ? latestMessage._id : null;
+        } else {
+            group.latestMessage = null; // No messages left, set latestMessage to null
+        }
 
-//         // Save the updated group
-//         await group.save();
-//     } catch (error) {
-//         // Handle errors if any
-//         console.error('Error cleaning deleted messages from group:', error);
-//         throw new apiError(500, 'Failed to clean deleted messages from group');
-//     }
-// };
+        // Save the updated group
+        await group.save();
+    } catch (error) {
+        // Handle errors if any
+        console.error('Error cleaning deleted messages from group:', error);
+        throw new apiError(500, 'Failed to clean deleted messages from group');
+    }
+};
 
 
   
@@ -62,8 +62,8 @@ const createMessage = asyncHandler(async (req, res) => {
       throw new apiError(404, 'Group not found');
   }
 
-  // Check if sender is a participant or admin of the group
-  if (!group.participants.includes(senderId) && group.admin.toString() !== senderId.toString()) {
+  // Check if sender is a participant 
+  if (!group.participants.includes(senderId)) {
       throw new apiError(403, 'You are not authorized to send messages in this group');
   }
 
@@ -81,12 +81,12 @@ const createMessage = asyncHandler(async (req, res) => {
       fileUrl = fileupload.url;
   }
 
-  // Fetch sender details (fullName)
+
   const sender = await User.findById(senderId, 'fullName username');
 
   const message = await Message.create({
       groupId,
-      sender: senderId, // Store sender's ID in the message
+      sender: senderId, 
       content,
       type: type || 'text', // Use 'text' as default if type is not provided
       file: fileUrl || '', // URL or path to the file (if messageType is 'file', 'image', etc.)
@@ -97,7 +97,8 @@ const createMessage = asyncHandler(async (req, res) => {
   group.messages.push(message._id);
   await group.save();
 
-//   await cleanDeletedMessagesByGroupId(groupId);
+//await cleanDeletedMessagesByGroupId(groupId);
+
   // Prepare response data including sender details
   const responseData = {
       _id: message._id,
@@ -119,7 +120,7 @@ const createMessage = asyncHandler(async (req, res) => {
 
 const getMessages = asyncHandler(async (req, res) => {
   const { groupId } = req.params;
-  const userId = req.user._id; // Assuming req.user._id contains the current user's ID
+  const userId = req.user._id; 
 
   const group = await Group.findById(groupId);
 
@@ -128,7 +129,7 @@ const getMessages = asyncHandler(async (req, res) => {
   }
 
   // Check if the user is a participant in the group
-  if (!group.participants.includes(userId) && group.admin.toString() !== userId.toString()) {
+  if (!group.participants.includes(userId)) {
     throw new apiError(403, 'You are not authorized to view messages in this group');
   }
   // Implement pagination for messages retrieval
@@ -156,7 +157,7 @@ const deleteMessage = asyncHandler(async (req, res) => {
       throw new apiError(404, "Group not found");
   }
 
-  if (!message.sender.equals(userId) && !group.admin.equals(userId)) {
+  if (!message.sender.equals(userId)) {
       throw new apiError(403, "You are not authorized to delete this message");
   }
 
@@ -175,7 +176,6 @@ const deleteMessage = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new apiResponse(200, {}, "Message deleted successfully"));
 });
-
 
 
 const updateMessage = asyncHandler(async (req, res) => {

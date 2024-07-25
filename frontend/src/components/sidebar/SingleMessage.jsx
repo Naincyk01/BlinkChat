@@ -1,7 +1,9 @@
 
 import React from 'react';
 
-const SingleMessage = ({ message, isOwnMessage }) => {
+const SingleMessage = ({ message,
+   isOwnMessage
+   }) => {
   const messageClass = isOwnMessage ? 'flex-row-reverse' : 'flex-row';
 
 

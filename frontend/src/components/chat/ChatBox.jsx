@@ -30,13 +30,16 @@ const ChatBox = ({ selectedUser }) => {
     socketRef.current = io('http://localhost:9000');
     socketRef.current.on('connect', () => {
       console.log('connected', socketRef.current.id);
-      socketRef.current.emit('joinRoom', selectedUser._id);
+      if (selectedUser._id) {
+        socketRef.current.emit('joinRoom', selectedUser._id);
+      }
 
       socketRef.current.on('message', message => {
-        setMessages(prevMessages => [...prevMessages, message]);
+        if (message.groupId === selectedUser._id) {
+          setMessages(prevMessages => [...prevMessages, message]);
+        }
       });
     });
-
     // Clean up socket connection
     return () => {
       socketRef.current.disconnect();
@@ -85,7 +88,8 @@ const ChatBox = ({ selectedUser }) => {
             <SingleMessage
               key={message._id}
               message={message}
-              isOwnMessage={message.sender.username === selectedUser.username} // Adjust the condition as per your data structure
+              // isOwnMessage={''}
+              isOwnMessage={message.sender.username===selectedUser.username} 
             />
           ))}
         </div>
