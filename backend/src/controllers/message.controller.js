@@ -44,8 +44,6 @@ const cleanDeletedMessagesByGroupId = async (groupId) => {
         throw new apiError(500, 'Failed to clean deleted messages from group');
     }
 };
-
-
   
 const createMessage = asyncHandler(async (req, res) => {
   const { groupId, content, type } = req.body;

@@ -7,7 +7,7 @@ import Image2 from '../../assets/welcomeImage2.svg';
 const WorkArea = () => {
   const text = "Connect easily with your friends and family...";
 
-  // Animation variants for image1 (first image)
+ 
   const image1Variants = {
     initial: { y: 0, opacity: 0 }, // Initial position and opacity
     animate: {
@@ -21,16 +21,16 @@ const WorkArea = () => {
     }
   };
 
-  // Animation variants for image2 (second image)
+
   const image2Variants = {
-    initial: { y: 0, opacity: 0 }, // Initial position and opacity
+    initial: { y: 0, opacity: 0 },
     animate: {
-      y: 10, // Animation position (downward)
-      opacity: 1, // Fade in effect
+      y: 10, 
+      opacity: 1, 
       transition: {
-        yoyo: Infinity, // Loop animation indefinitely
-        duration: 2, // Animation duration
-        ease: "easeInOut" // Easing function
+        yoyo: Infinity, 
+        duration: 2, 
+        ease: "easeInOut" 
       }
     }
   };
@@ -39,8 +39,8 @@ const WorkArea = () => {
     hidden: {},
     visible: {
       transition: {
-        staggerChildren: 0.08, // Delay between each letter
-        delayChildren: 1 // Delay before animation starts
+        staggerChildren: 0.08, 
+        delayChildren: 1 
       }
     }
   };
@@ -51,8 +51,8 @@ const WorkArea = () => {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.3, // Duration for each letter to appear (adjust as needed)
-        ease: 'easeOut' // Easing function for smooth animation
+        duration: 0.3, 
+        ease: 'easeOut' 
       }
     }
   };
@@ -84,15 +84,24 @@ const WorkArea = () => {
 
         {/* Animated text using Framer Motion */}
         <motion.div
-          className="text-logoFontSize font-semibold text-white" // Apply necessary styling here, set text color to white
+          className="text-logoFontSize  font-bold text-white"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
-          {text.split("").map((char, index) => (
-            <motion.span key={index} variants={letterVariants}>{char}</motion.span>
-          ))}
+          <div className="flex flex-wrap justify-center">
+            {text.split(" ").map((word, wordIndex) => (
+              <span key={wordIndex} className="mr-4"> {/* Add margin to space out words */}
+                {word.split("").map((char, charIndex) => (
+                  <motion.span key={charIndex} variants={letterVariants}>
+                    {char}
+                  </motion.span>
+                ))}
+              </span>
+            ))}
+          </div>
         </motion.div>
+
 
         <LuMessagesSquare className="" size={50} />
       </div>

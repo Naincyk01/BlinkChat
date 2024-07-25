@@ -1,16 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from '../../axiosInstance.jsx';
 import io from 'socket.io-client';
-import SingleMessage from '../sidebar/SingleMessage.jsx'; 
+import SingleMessage from '../messageskeleton/SingleMessage.jsx'; 
 
 const ChatBox = ({ selectedUser }) => {
-  // console.log(selectedUser)
   const [messages, setMessages] = useState([]);
   const [currentMessage, setCurrentMessage] = useState('');
   const socketRef = useRef(null);
 
   useEffect(() => {
-    
     const fetchPreviousMessages = async () => {
       try {
         const response = await axios.get(`/messages/${selectedUser._id}`);
@@ -25,7 +23,6 @@ const ChatBox = ({ selectedUser }) => {
     if (selectedUser._id) {
       fetchPreviousMessages();
     }
-
     // Socket connection setup
     socketRef.current = io('http://localhost:9000');
     socketRef.current.on('connect', () => {
@@ -33,12 +30,9 @@ const ChatBox = ({ selectedUser }) => {
       if (selectedUser._id) {
         socketRef.current.emit('joinRoom', selectedUser._id);
       }
-
       socketRef.current.on('message', message => {
-
         if (message.groupId === selectedUser._id) {
           setMessages(prevMessages => [...prevMessages, message]);
-       
         }
       });
     });
@@ -50,7 +44,6 @@ const ChatBox = ({ selectedUser }) => {
 
   const sendMessage = async () => {
     if (!currentMessage.trim()) return; // Do not send empty messages
-
     try {
       const response = await axios.post('/messages/', {
         groupId: selectedUser._id,
@@ -76,22 +69,20 @@ const ChatBox = ({ selectedUser }) => {
       <div className="flex flex-col w-full h-full bg-[#0D0D0D] border border-primaryLight border-opacity-50 rounded-xl gap-2">
         {/* Top section: Receiver's info */}
         <div className="flex items-start pb-3 border-b border-gray-600 p-4">
-          <div className="border h-14 rounded-full w-14 bg-gray-600">        <img src={selectedUser.profilepic} className="h-full w-full rounded-full" alt="Profile Picture" /></div>
+          <div className="border h-14 rounded-full w-14 bg-gray-600"><img src={selectedUser.profilepic} className="h-full w-full rounded-full" alt="Profile Picture" /></div>
           <div className="flex flex-col pl-2">
-            <h3 className="text-lg font-semibold text-white">{selectedUser.username}</h3>
+            <h3 className="text-lg font-semibold text-white">{selectedUser.fullName}</h3>
             <p className="text-sm text-gray-400">online</p>
           </div>
         </div>
 
-       
-      
         <div className="flex-1 overflow-y-auto mb-3 p-4 scrollbar-hidden">
           {messages.map(message => (
             <SingleMessage
               key={message._id}
               message={message}
               // isOwnMessage={''}
-              isOwnMessage={message.sender.username===selectedUser.username} 
+              isOwnMessage={message.sender.fullName===selectedUser.fullName} 
             />
           ))}
         </div>

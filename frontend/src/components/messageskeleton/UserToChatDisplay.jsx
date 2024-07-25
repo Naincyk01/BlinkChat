@@ -14,12 +14,14 @@ const UserToChatDisplay = ({ user, onClick }) => {
 
         <div className="flex flex-col">
           <h3 className="text-lg font-semibold">{user.fullName}</h3>
-          <p className="text-sm text-gray-700">{user.type}</p>
+          <p className="text-sm text-gray-700">{""}</p>
+          {/* yaha chaiye latest message  */}
         </div>
 
        </div>
         <div className="flex flex-col gap-y-2">
           <div className="text-xs text-gray-500 flex">{user.bio}</div>
+          {/* yaha chaiye latest message ka time and date */}
           <div className='flex justify-end'>✅</div>
         </div>
 
