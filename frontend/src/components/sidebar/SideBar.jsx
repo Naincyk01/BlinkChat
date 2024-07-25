@@ -37,7 +37,7 @@ const SideBar = ({ onUserClick }) => {
         const user = response.data.data;
         setCurrentUser(user);
         if (user.profilepic) {
-          setProfilePic(user.profilepic); // Update profile picture state if available
+          setProfilePic(user.profilepic); 
         }
       } catch (error) {
         console.error('Error fetching current user:', error);
@@ -67,12 +67,12 @@ const SideBar = ({ onUserClick }) => {
 
   const handleLogout = async () => {
     try {
-      await axios.post('/users/logout'); // Logout API call
+      await axios.post('/users/logout'); 
 
-      setCurrentUser(null); // Clear current user state
-      setProfilePic(Profile); // Reset profile picture to default
+      setCurrentUser(null); 
+      setProfilePic(Profile); 
       
-      navigate('/'); // Redirect to home page after logout
+      navigate('/'); 
     } catch (error) {
       console.error('Error logging out:', error);
     }
@@ -93,7 +93,7 @@ const SideBar = ({ onUserClick }) => {
           src={profilePic}
           // src={Profile}
           alt="User Avatar"
-          className="border h-20 rounded-full w-20"
+          className="border h-20 rounded-full w-20 flex justify-center items-center"
         />
 
         <div className="flex flex-col gap-5">
@@ -135,7 +135,7 @@ const SideBar = ({ onUserClick }) => {
           />
         </div>
         <div
-          className={`bg-[#0D0D0D] rounded-md pl-4 pr-4 shadow-md border border-primaryLight border-opacity-50 h-auto overflow-y-auto ${
+          className={`bg-[#0D0D0D] rounded-md px-4 shadow-md border border-primaryLight border-opacity-50 h-auto overflow-y-auto ${
             filteredUsers.length > 0 ? 'scrollbar-hidden' : ''
           }`}
         >

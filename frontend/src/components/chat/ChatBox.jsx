@@ -76,7 +76,7 @@ const ChatBox = ({ selectedUser }) => {
       <div className="flex flex-col w-full h-full bg-[#0D0D0D] border border-primaryLight border-opacity-50 rounded-xl gap-2">
         {/* Top section: Receiver's info */}
         <div className="flex items-start pb-3 border-b border-gray-600 p-4">
-          <div className="border h-14 rounded-full w-14 bg-gray-600"></div>
+          <div className="border h-14 rounded-full w-14 bg-gray-600">        <img src={selectedUser.profilepic} className="h-full w-full rounded-full" alt="Profile Picture" /></div>
           <div className="flex flex-col pl-2">
             <h3 className="text-lg font-semibold text-white">{selectedUser.username}</h3>
             <p className="text-sm text-gray-400">online</p>
