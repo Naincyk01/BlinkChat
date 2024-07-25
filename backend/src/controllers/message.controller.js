@@ -97,7 +97,7 @@ const createMessage = asyncHandler(async (req, res) => {
   group.messages.push(message._id);
   await group.save();
 
-//await cleanDeletedMessagesByGroupId(groupId);
+await cleanDeletedMessagesByGroupId(groupId);
 
   // Prepare response data including sender details
   const responseData = {

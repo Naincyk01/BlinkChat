@@ -4,18 +4,18 @@ import io from 'socket.io-client';
 import SingleMessage from '../sidebar/SingleMessage.jsx'; 
 
 const ChatBox = ({ selectedUser }) => {
-  console.log(selectedUser)
+  // console.log(selectedUser)
   const [messages, setMessages] = useState([]);
   const [currentMessage, setCurrentMessage] = useState('');
   const socketRef = useRef(null);
 
   useEffect(() => {
-    // Function to fetch previous messages
+    
     const fetchPreviousMessages = async () => {
       try {
         const response = await axios.get(`/messages/${selectedUser._id}`);
         const { data } = response.data;
-        setMessages(data); // Update messages state with fetched messages
+        setMessages(data); 
       } catch (error) {
         console.error('Error fetching previous messages:', error);
       }
@@ -35,8 +35,10 @@ const ChatBox = ({ selectedUser }) => {
       }
 
       socketRef.current.on('message', message => {
+
         if (message.groupId === selectedUser._id) {
           setMessages(prevMessages => [...prevMessages, message]);
+       
         }
       });
     });

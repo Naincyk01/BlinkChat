@@ -23,6 +23,7 @@ const SideBar = ({ onUserClick }) => {
       try {
         const response = await axios.get('/groups/findone');
         const groupData = response.data.data;
+        console.log(groupData)
         setUsers(groupData);
         setFilteredUsers(groupData);
       } catch (error) {
@@ -80,7 +81,7 @@ const SideBar = ({ onUserClick }) => {
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen); 
   };
-
+// console.log(currentUser);
   return (
     <div className="h-auto w-auto p-4 flex">
       <div

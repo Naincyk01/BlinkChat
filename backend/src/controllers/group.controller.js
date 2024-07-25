@@ -266,6 +266,7 @@ const findOneByUser = asyncHandler(async (req, res) => {
                 fullName: '$fullName',
                 username: '$username',
                 bio: '$bio',
+                profilepic:'$profilepic',
                 latestMessage: 1,
                 messages: 1,
                 createdAt: 1,
