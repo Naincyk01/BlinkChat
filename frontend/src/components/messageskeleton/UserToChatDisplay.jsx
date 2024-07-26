@@ -51,17 +51,38 @@ const UserToChatDisplay = ({ user, onClick }) => {
     };
   }, [user._id]);
 
+  const truncateMessage = (message, maxLength) => {
+    if (!message || message.length <= maxLength) {
+      return message;
+    }
+    return `${message.substring(0, maxLength)}...`;
+  };
+
+  const formatTimestamp = (timestamp) => {
+    if (!timestamp) return '';
+    const date = new Date(timestamp);
+
+    // Manual formatting
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const year = date.getFullYear();
+    
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    
+    hours = hours % 12;
+    hours = hours ? String(hours).padStart(2, '0') : '12'; // '0' should be '12' for midnight
+    
+    return `${day}/${month}/${year} ${hours}:${minutes} ${ampm}`;
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
 
   const content = latestMessage?.content || 'No message available';
   const createdAt = latestMessage?.createdAt;
-
-  const formatTimestamp = timestamp => {
-    if (!timestamp) return '';
-    const date = new Date(timestamp);
-    return date.toLocaleString();
-  };
+  const truncatedContent = truncateMessage(content, 10); // Adjust 10 to desired length
 
   return (
     <div
@@ -74,15 +95,15 @@ const UserToChatDisplay = ({ user, onClick }) => {
         </div>
         <div className="flex flex-col">
           <h3 className="text-lg font-semibold">{user.fullName}</h3>
-          <p className="text-sm text-gray-700">{content}</p>
+          <p className="text-sm text-gray-500">{truncatedContent}</p>
         </div>
       </div>
       <div className="flex flex-col gap-y-2">
-        <div className="text-xs text-gray-500 flex">
-          {user.bio}
-        </div>
         <div className='text-xs text-gray-500 flex justify-end'>
           {formatTimestamp(createdAt)}
+        </div>
+        <div className="text-xs text-gray-500 flex justify-end">
+          ✅
         </div>
       </div>
     </div>
