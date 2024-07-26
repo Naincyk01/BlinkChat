@@ -229,4 +229,50 @@ const getUnreadMessagesCount = asyncHandler(async (req, res) => {
 });
 
 
-export { createMessage, getMessages, deleteMessage,updateMessage,markMessageAsRead,getUnreadMessagesCount };
+const getMessageByMessageId = asyncHandler(async (req, res) => {
+    const { messageId } = req.params;
+    const userId = req.user._id;
+
+    // Find the message by its ID
+    const message = await Message.findById(messageId).populate('sender', 'username fullName').exec()
+       
+
+    // Check if the message exists
+    if (!message) {
+        throw new apiError(404, "Message not found");
+    }
+
+    // Check if the user is authorized to view the message
+    const group = await Group.findById(message.groupId).exec();
+    if (!group) {
+        throw new apiError(404, "Group not found");
+    }
+
+    if (!group.participants.includes(userId)) {
+        throw new apiError(403, "You are not authorized to view this message");
+    }
+
+    // Prepare response data
+    const responseData = {
+        _id: message._id,
+        groupId: message.groupId,
+        sender: {
+            _id: message.sender._id,
+            fullName: message.sender.fullName,
+            username: message.sender.username,
+        },
+        content: message.content,
+        type: message.type,
+        file: message.file,
+        isRead: message.isRead,
+        createdAt: message.createdAt,
+        updatedAt: message.updatedAt,
+    };
+
+    return res.status(200).json(new apiResponse(200, responseData, "Message retrieved successfully"));
+});
+
+
+
+
+export { createMessage, getMessages, deleteMessage,updateMessage,markMessageAsRead,getUnreadMessagesCount ,getMessageByMessageId};
