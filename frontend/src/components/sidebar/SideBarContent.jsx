@@ -8,11 +8,13 @@ import { GrLogout } from 'react-icons/gr';
 import { IoSettingsOutline } from 'react-icons/io5';
 import axios from '../../axiosInstance.jsx';
 import Profile from '../../assets/bglogin.png';
+import UserProfileModal from './UserProfileModal.jsx'; 
 
 const SidebarContent = () => {
   const navigate = useNavigate();
   const [profilePic, setProfilePic] = useState(Profile);
   const [currentUser, setCurrentUser] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -22,6 +24,7 @@ const SidebarContent = () => {
         if (user.profilepic) {
           setProfilePic(user.profilepic);
         }
+        setCurrentUser(user);
       } catch (error) {
         console.error('Error fetching current user:', error);
       }
@@ -40,12 +43,21 @@ const SidebarContent = () => {
     }
   };
 
+  const handleProfilePicClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <div className="bg-primary h-full flex flex-col justify-between items-center w-[162px] rounded-lg p-4 gap-10">
       <img
         src={profilePic}
         alt="User Avatar"
-        className="border h-20 rounded-full w-20 flex justify-center items-center"
+        className="border h-20 rounded-full w-20 flex justify-center items-center cursor-pointer"
+        onClick={handleProfilePicClick}
       />
 
       <div className="flex flex-col gap-5">
@@ -69,6 +81,10 @@ const SidebarContent = () => {
       >
         <GrLogout size={38} />
       </div>
+
+      {isModalOpen && currentUser && (
+        <UserProfileModal user={currentUser} onClose={closeModal} />
+      )}
     </div>
   );
 };

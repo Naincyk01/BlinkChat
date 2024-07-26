@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from '../../axiosInstance.jsx';
 import io from 'socket.io-client';
-import SingleMessage from '../messageskeleton/SingleMessage.jsx'; 
+import SingleMessage from '../messageskeleton/SingleMessage.jsx';
 
 const ChatBox = ({ selectedUser }) => {
   const [messages, setMessages] = useState([]);
@@ -13,7 +13,7 @@ const ChatBox = ({ selectedUser }) => {
       try {
         const response = await axios.get(`/messages/${selectedUser._id}`);
         const { data } = response.data;
-        setMessages(data); 
+        setMessages(data);
       } catch (error) {
         console.error('Error fetching previous messages:', error);
       }
@@ -63,13 +63,18 @@ const ChatBox = ({ selectedUser }) => {
   const handleInputChange = e => {
     setCurrentMessage(e.target.value);
   };
-console.log(messages)
   return (
     <div className="w-full h-screen bg-chatBg p-4 flex">
       <div className="flex flex-col w-full h-full bg-[#0D0D0D] border border-primaryLight border-opacity-50 rounded-xl gap-2">
         {/* Top section: Receiver's info */}
         <div className="flex items-start pb-3 border-b border-gray-600 p-4">
-          <div className="border h-14 rounded-full w-14 bg-gray-600"><img src={selectedUser.profilepic} className="h-full w-full rounded-full" alt="Profile Picture" /></div>
+          <div className="border h-14 rounded-full w-14 bg-gray-600">
+            <img
+              src={selectedUser.profilepic}
+              className="h-full w-full rounded-full"
+              alt="Profile Picture"
+            />
+          </div>
           <div className="flex flex-col pl-2">
             <h3 className="text-lg font-semibold text-white">{selectedUser.fullName}</h3>
             <p className="text-sm text-gray-400">online</p>
@@ -77,14 +82,15 @@ console.log(messages)
         </div>
 
         <div className="flex-1 overflow-y-auto mb-3 p-4 scrollbar-hidden">
-          {messages.map(message => (
-            <SingleMessage
-              key={message._id}
-              message={message}
-              // isOwnMessage={''}
-              isOwnMessage={message.sender.fullName===selectedUser.fullName} 
-            />
-          ))}
+          {messages.map(message => {
+            return (
+              <SingleMessage
+                key={message._id}
+                message={message}
+                isOwnMessage={message.sender.fullName === selectedUser.fullName}
+              />
+            );
+          })}
         </div>
 
         {/* Bottom section: Input message */}

@@ -26,7 +26,6 @@ const UserToChatDisplay = ({ user, onClick }) => {
         setLoading(false);
       }
     };
-
     fetchLatestMessage();
   }, [latestMessageId]);
 
@@ -43,6 +42,7 @@ const UserToChatDisplay = ({ user, onClick }) => {
       if (message.groupId === user._id) {
         // Update the latest message
         setLatestMessage(message);
+        console.log(message)
       }
     });
 
@@ -111,3 +111,4 @@ const UserToChatDisplay = ({ user, onClick }) => {
 };
 
 export default UserToChatDisplay;
+

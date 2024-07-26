@@ -15,7 +15,7 @@ const SideBar = ({ onUserClick }) => {
       try {
         const response = await axios.get('/groups/findone');
         const groupData = response.data.data;
-        console.log(groupData);
+        // console.log(groupData);
         setUsers(groupData);
         setFilteredUsers(groupData);
       } catch (error) {
@@ -74,10 +74,14 @@ const SideBar = ({ onUserClick }) => {
         >
           <div className="text-white font-semibold px-4 py-2">People</div>
           <div className="flex flex-col gap-2">
+            
             {Array.isArray(filteredUsers) && filteredUsers.length > 0 ? (
-              filteredUsers.map(user => (
+              filteredUsers.map(user => {
+                // console.log("Rendering user:", user);
+                return (
                 <UserToChatDisplay key={user._id} user={user} onClick={() => onUserClick(user)} />
-              ))
+              );
+            })
             ) : (
               <p>No users found.</p>
             )}
