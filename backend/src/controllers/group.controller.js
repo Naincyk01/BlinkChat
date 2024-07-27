@@ -149,32 +149,23 @@ const deleteGroup = asyncHandler(async (req, res) => {
     const { groupId } = req.params;
     const userId = req.user._id;
 
-    // Find the group or conversation by ID
     const conversation = await Group.findById(groupId);
 
-    // Check if the group exists
     if (!conversation) {
         throw new apiError(404, "Conversation not found");
     }
 
-    // Handle message deletion if messages are embedded
     if (conversation.type === 'one_to_one' || conversation.type === 'group') {
         if (conversation.messages && conversation.messages.length > 0) {
-            // Extract message IDs
             const messageIds = conversation.messages.map(msg => msg._id);
 
-            // Delete each message by ID
             for (const messageId of messageIds) {
                 await Message.findByIdAndDelete(messageId);
             }
         }
-
-        // Check if the user is authorized to delete the group
         if (conversation.type === 'group' && conversation.admin.toString() !== userId.toString()) {
             throw new apiError(403, "You are not authorized to delete this conversation");
         }
-
-        // Delete the group itself
         await Group.findByIdAndDelete(groupId);
     } else {
         throw new apiError(400, "Invalid conversation type");
