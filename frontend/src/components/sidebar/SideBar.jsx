@@ -3,6 +3,9 @@ import axios from '../../axiosInstance.jsx';
 import UserToChatDisplay from '../messageskeleton/UserToChatDisplay.jsx';
 import { IoMenu } from 'react-icons/io5';
 import SidebarContent from './SideBarContent.jsx';
+import { IoMdPersonAdd } from "react-icons/io";
+import { BsPeopleFill } from "react-icons/bs";
+import UserSearchCreate from './UserSearchCreate.jsx';
 
 const SideBar = ({ onUserClick }) => {
   const [users, setUsers] = useState([]);
@@ -11,6 +14,7 @@ const SideBar = ({ onUserClick }) => {
   const [filteredGroups, setFilteredGroups] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -72,18 +76,26 @@ const SideBar = ({ onUserClick }) => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const openPopup = () => {
+    setIsPopupOpen(true);
+  };
+  const closePopup = () => {
+    setIsPopupOpen(false);
+  };
+
   return (
     <div className="h-auto w-auto p-4 flex">
       <div className={`${isSidebarOpen ? '' : 'hidden'}`}>
         <SidebarContent />
       </div>
-      <div className="w-[350px] h-full flex flex-col pl-6 gap-6">
-        <div className="w-full flex justify-center items-center gap-x-2">
-          <IoMenu
-            size={30}
-            className="bg-[#0D0D0D] h-8 rounded-md border border-[#BCBEC0] border-opacity-50 cursor-pointer"
-            onClick={toggleSidebar}
+      <div className="w-[350px] h-full flex flex-col pl-5 gap-4">
+        <div className='flex justify-end gap-x-2'>
+          <IoMenu size={24} className="bg-[#0D0D0D] h-6 rounded-md border border-[#BCBEC0] border-opacity-50 cursor-pointer" onClick={toggleSidebar}
           />
+          <IoMdPersonAdd size={24} className="bg-[#0D0D0D] h-6 w-6 rounded-full border border-[#BCBEC0] border-opacity-50 cursor-pointer" onClick={openPopup} />
+          <BsPeopleFill size={24} className="bg-[#0D0D0D] h-6 w-6 rounded-full border border-[#BCBEC0] border-opacity-50 cursor-pointer"/>
+        </div>
+        <div className="w-full flex justify-center items-center ">
           <input
             type="text"
             className="w-full h-8 rounded-md px-4 border border-[#BCBEC0] focus:border-primaryDark focus:outline-none bg-[#0D0D0D] text-sm border-opacity-50"
@@ -93,10 +105,10 @@ const SideBar = ({ onUserClick }) => {
           />
         </div>
         <div
-          className={`bg-[#0D0D0D] rounded-md px-4 shadow-md border border-primaryLight border-opacity-50 h-auto overflow-y-auto ${filteredUsers.length > 0 ? 'scrollbar-hidden' : ''}`}
+          className={`bg-[#0D0D0D] rounded-xl px-4 shadow-md border border-primaryLight border-opacity-50 h-[50%] overflow-y-auto ${filteredUsers.length > 0 ? 'scrollbar-hidden' : ''}`}
         >
-          <div className="text-white font-semibold px-4 py-2">People</div>
-          <div className="flex flex-col gap-2">
+          <div className="text-white font-semibold py-2">People</div>
+          <div className="flex flex-col gap-2 ">
             {Array.isArray(filteredUsers) && filteredUsers.length > 0 ? (
               filteredUsers.map(user => {
                 return (
@@ -114,9 +126,9 @@ const SideBar = ({ onUserClick }) => {
           </div>
         </div>
         <div
-          className={`bg-[#0D0D0D] rounded-md px-4 shadow-md border border-primaryLight border-opacity-50 h-auto overflow-y-auto ${filteredGroups.length > 0 ? 'scrollbar-hidden' : ''}`}
+          className={`bg-[#0D0D0D] rounded-xl px-4 shadow-md border border-primaryLight border-opacity-50 h-[50%] overflow-y-auto ${filteredGroups.length > 0 ? 'scrollbar-hidden' : ''}`}
         >
-          <div className="text-white font-semibold px-4 py-2">Groups</div>
+          <div className="text-white font-semibold py-2">Groups</div>
           <div className="flex flex-col gap-2">
             {Array.isArray(filteredGroups) && filteredGroups.length > 0 ? (
               filteredGroups.map(group => (
@@ -133,6 +145,7 @@ const SideBar = ({ onUserClick }) => {
           </div>
         </div>
       </div>
+      {isPopupOpen && <UserSearchCreate onClose={closePopup} />}
     </div>
   );
 };
