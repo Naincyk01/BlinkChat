@@ -147,23 +147,25 @@ const removeParticipant = asyncHandler(async (req, res) => {
 const deleteGroup = asyncHandler(async (req, res) => {
  
     const { groupId } = req.params;
-    const userId = req.user._id; // Assuming req.user._id contains the current user's ID
+    const userId = req.user._id; 
 
     const conversation = await Group.findById(groupId);
 
     if (!conversation) {
         throw new apiError(404, "Conversation not found");
     }
-
-    // Check if the current user is the admin of the conversation
-    if (conversation.admin.toString() !== userId.toString()) {
-        throw new apiError(403, "You are not authorized to delete this conversation");
+    if (conversation.type === 'one_to_one') {
+        await Group.findByIdAndDelete(groupId);
+    } else if (conversation.type === 'group') {
+        if (conversation.admin.toString() !== userId.toString()) {
+            throw new apiError(403, "You are not authorized to delete this conversation");
+        }
+        await Group.findByIdAndDelete(groupId);
+    } else {
+        throw new apiError(400, "Invalid conversation type");
     }
 
-    await Group.findByIdAndDelete(groupId);
-
     return res.status(200).json(new apiResponse(200, {}, "Conversation deleted successfully"));
-
 });
 
 

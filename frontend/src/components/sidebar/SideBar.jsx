@@ -16,32 +16,33 @@ const SideBar = ({ onUserClick }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
+
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await axios.get('/groups/findone');
-        const userData = response.data.data;
-        setUsers(userData);
-        setFilteredUsers(userData);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      }
-    };
-
-    const fetchGroups = async () => {
-      try {
-        const response = await axios.get('/groups/findgroup');
-        const groupData = response.data.data;
-        setGroups(groupData);
-        setFilteredGroups(groupData);
-      } catch (error) {
-        console.error('Error fetching groups:', error);
-      }
-    };
-
     fetchUsers();
     fetchGroups();
   }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get('/groups/findone');
+      const userData = response.data.data;
+      setUsers(userData);
+      setFilteredUsers(userData);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+
+  const fetchGroups = async () => {
+    try {
+      const response = await axios.get('/groups/findgroup');
+      const groupData = response.data.data;
+      setGroups(groupData);
+      setFilteredGroups(groupData);
+    } catch (error) {
+      console.error('Error fetching groups:', error);
+    }
+  };
 
   const handleSearchChange = event => {
     const query = event.target.value;
@@ -55,7 +56,7 @@ const SideBar = ({ onUserClick }) => {
       setFilteredUsers(users);
     } else {
       const filtered = users.filter(user =>
-        user.username.toLowerCase().includes(query.toLowerCase()),
+        user.fullName.toLowerCase().includes(query.toLowerCase()),
       );
       setFilteredUsers(filtered);
     }
@@ -83,6 +84,11 @@ const SideBar = ({ onUserClick }) => {
     setIsPopupOpen(false);
   };
 
+  const handleChatCreated = () => {
+    alert('Chat created successfully!');
+    fetchUsers();
+    fetchGroups(); 
+  };
   return (
     <div className="h-auto w-auto p-4 flex">
       <div className={`${isSidebarOpen ? '' : 'hidden'}`}>
@@ -145,7 +151,7 @@ const SideBar = ({ onUserClick }) => {
           </div>
         </div>
       </div>
-      {isPopupOpen && <UserSearchCreate onClose={closePopup} />}
+      {isPopupOpen && <UserSearchCreate onClose={closePopup}  onChatCreated={handleChatCreated}/>}
     </div>
   );
 };
