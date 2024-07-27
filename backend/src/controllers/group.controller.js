@@ -3,6 +3,7 @@ import { User } from "../models/user.model.js";
 import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import {Message} from '../models/message.model.js'
 
 
 const createOneToOneConversation = asyncHandler(async (req, res) => {
@@ -145,27 +146,41 @@ const removeParticipant = asyncHandler(async (req, res) => {
 
 
 const deleteGroup = asyncHandler(async (req, res) => {
- 
     const { groupId } = req.params;
-    const userId = req.user._id; 
+    const userId = req.user._id;
 
+    // Find the group or conversation by ID
     const conversation = await Group.findById(groupId);
 
+    // Check if the group exists
     if (!conversation) {
         throw new apiError(404, "Conversation not found");
     }
-    if (conversation.type === 'one_to_one') {
-        await Group.findByIdAndDelete(groupId);
-    } else if (conversation.type === 'group') {
-        if (conversation.admin.toString() !== userId.toString()) {
+
+    // Handle message deletion if messages are embedded
+    if (conversation.type === 'one_to_one' || conversation.type === 'group') {
+        if (conversation.messages && conversation.messages.length > 0) {
+            // Extract message IDs
+            const messageIds = conversation.messages.map(msg => msg._id);
+
+            // Delete each message by ID
+            for (const messageId of messageIds) {
+                await Message.findByIdAndDelete(messageId);
+            }
+        }
+
+        // Check if the user is authorized to delete the group
+        if (conversation.type === 'group' && conversation.admin.toString() !== userId.toString()) {
             throw new apiError(403, "You are not authorized to delete this conversation");
         }
+
+        // Delete the group itself
         await Group.findByIdAndDelete(groupId);
     } else {
         throw new apiError(400, "Invalid conversation type");
     }
 
-    return res.status(200).json(new apiResponse(200, {}, "Conversation deleted successfully"));
+    return res.status(200).json(new apiResponse(200, {}, "Conversation and associated messages deleted successfully"));
 });
 
 
