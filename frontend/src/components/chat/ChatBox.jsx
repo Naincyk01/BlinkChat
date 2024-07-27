@@ -63,6 +63,9 @@ const ChatBox = ({ selectedUser }) => {
   const handleInputChange = e => {
     setCurrentMessage(e.target.value);
   };
+  const isGroupChat = selectedUser.type === 'group';
+  const headerTitle = isGroupChat ? selectedUser.name : selectedUser.fullName;
+  const headerSubtitle = isGroupChat ? `${selectedUser.participants.length} members` : 'online';
   return (
     <div className="w-full h-screen bg-chatBg p-4 flex">
       <div className="flex flex-col w-full h-full bg-[#0D0D0D] border border-primaryLight border-opacity-50 rounded-xl gap-2">
@@ -76,8 +79,8 @@ const ChatBox = ({ selectedUser }) => {
             />
           </div>
           <div className="flex flex-col pl-2">
-            <h3 className="text-lg font-semibold text-white">{selectedUser.fullName}</h3>
-            <p className="text-sm text-gray-400">online</p>
+            <h3 className="text-lg font-semibold text-white">{headerTitle}</h3>
+            <p className="text-sm text-gray-400">{headerSubtitle}</p>
           </div>
         </div>
 

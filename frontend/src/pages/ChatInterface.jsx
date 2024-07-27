@@ -6,8 +6,8 @@ import ChatBox from "../components/chat/ChatBox.jsx";
 const ChatInterface = () => {
   const [selectedUser, setSelectedUser] = useState(null);
 
-   const handleUserClick = (user) => {
-    setSelectedUser(user);
+  const handleUserClick = (entity) => {
+    setSelectedUser(entity);
   };
 
   return (

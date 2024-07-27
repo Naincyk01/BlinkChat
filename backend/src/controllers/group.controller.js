@@ -26,7 +26,7 @@ const createOneToOneConversation = asyncHandler(async (req, res) => {
     }
 
     const type = 'one_to_one';
-    const participantIds = [participantUser._id];
+    const participantIds = [participantUser._id, admin];
 
     const conversation = await Group.create({
         type,
@@ -37,9 +37,6 @@ const createOneToOneConversation = asyncHandler(async (req, res) => {
         throw new apiError(500, "Failed to create conversation");
     }
 
-    // Add the logged-in user as an additional participant
-    conversation.participants.push(admin);
-    await conversation.save();
 
     res.status(201).json(new apiResponse(201, conversation, "One-to-one conversation created successfully"));
 });
@@ -85,6 +82,7 @@ const createGroupConversation = asyncHandler(async (req, res) => {
 
     res.status(201).json(new apiResponse(201, conversation, "Group conversation created successfully"));
 });
+
 
 
 const addParticipants = asyncHandler(async (req, res) => {
@@ -216,13 +214,24 @@ const updateGroup = asyncHandler(async (req, res) => {
 
 
 
+
 const findOneByUser = asyncHandler(async (req, res) => {
-    const userId = req.user._id; 
+    const userId = req.user._id;
 
     const groups = await Group.aggregate([
         {
             $match: {
                 participants: userId
+            }
+        },
+        {
+            $addFields: {
+                participantCount: { $size: "$participants" }
+            }
+        },
+        {
+            $match: {
+                participantCount: 2
             }
         },
         {
@@ -238,7 +247,7 @@ const findOneByUser = asyncHandler(async (req, res) => {
         },
         {
             $match: {
-                'participants._id': { $ne: userId } // Exclude the logged-in user
+                'participants._id': { $ne: userId }
             }
         },
         {
@@ -266,7 +275,7 @@ const findOneByUser = asyncHandler(async (req, res) => {
                 fullName: '$fullName',
                 username: '$username',
                 bio: '$bio',
-                profilepic:'$profilepic',
+                profilepic: '$profilepic',
                 latestMessage: 1,
                 messages: 1,
                 createdAt: 1,
@@ -275,9 +284,6 @@ const findOneByUser = asyncHandler(async (req, res) => {
             }
         }
     ]);
-
-    if (!groups || groups.length === 0) {
-    }
 
     res.status(200).json({
         statusCode: 200,
@@ -290,22 +296,21 @@ const findOneByUser = asyncHandler(async (req, res) => {
 
 
 const getGroupConversations = asyncHandler(async (req, res) => {
-    const userId = req.user._id; // Assuming req.user._id contains the logged-in user's ID
+    const userId = req.user._id;
 
-    // Find all group conversations where the user is either admin or participant
     const groupConversations = await Group.find({
         $or: [
-            { admin: userId }, // User is admin
-            { participants: userId } // User is participant
-        ]
-    })
-    .catch(err => {
-        throw new apiError(500, err.message || "Error retrieving group conversations");
+            { admin: userId }, 
+            { participants: userId } 
+        ],
+        $expr: {
+            $gt: [{ $size: "$participants" }, 2] 
+        }
     });
 
-    // Respond with the retrieved group conversations
     res.status(200).json(new apiResponse(200, groupConversations, "Group conversations retrieved successfully"));
 });
+
 
 export {
     createOneToOneConversation,
