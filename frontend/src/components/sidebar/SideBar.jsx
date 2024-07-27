@@ -6,6 +6,7 @@ import SidebarContent from './SideBarContent.jsx';
 import { IoMdPersonAdd } from "react-icons/io";
 import { BsPeopleFill } from "react-icons/bs";
 import UserSearchCreate from './UserSearchCreate.jsx';
+import GroupSearchCreate from './GroupSearchCreate.jsx';
 
 const SideBar = ({ onUserClick }) => {
   const [users, setUsers] = useState([]);
@@ -14,8 +15,8 @@ const SideBar = ({ onUserClick }) => {
   const [filteredGroups, setFilteredGroups] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-
+  const [isUserPopupOpen, setIsUserPopupOpen] = useState(false);
+  const [isGroupPopupOpen, setIsGroupPopupOpen] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -77,29 +78,43 @@ const SideBar = ({ onUserClick }) => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const openPopup = () => {
-    setIsPopupOpen(true);
+  const openUserPopup = () => {
+    setIsUserPopupOpen(true);
   };
-  const closePopup = () => {
-    setIsPopupOpen(false);
+
+  const closeUserPopup = () => {
+    setIsUserPopupOpen(false);
+  };
+
+  const openGroupPopup = () => {
+    setIsGroupPopupOpen(true);
+  };
+
+  const closeGroupPopup = () => {
+    setIsGroupPopupOpen(false);
   };
 
   const handleChatCreated = () => {
-    alert('Chat created successfully!');
+    alert('Chat created successfully !');
     fetchUsers();
-    fetchGroups(); 
   };
+
+  const handleGroupCreated = () => {
+    alert('Group created successfully!');
+    fetchGroups();
+  };
+
   return (
     <div className="h-auto w-auto p-4 flex">
-      <div className={`${isSidebarOpen ? '' : 'hidden'}`}>
+      <div className={isSidebarOpen ? '' : 'hidden'}>
         <SidebarContent />
       </div>
       <div className="w-[350px] h-full flex flex-col pl-5 gap-4">
         <div className='flex justify-end gap-x-2'>
           <IoMenu size={24} className="bg-[#0D0D0D] h-6 rounded-md border border-[#BCBEC0] border-opacity-50 cursor-pointer" onClick={toggleSidebar}
           />
-          <IoMdPersonAdd size={24} className="bg-[#0D0D0D] h-6 w-6 rounded-full border border-[#BCBEC0] border-opacity-50 cursor-pointer" onClick={openPopup} />
-          <BsPeopleFill size={24} className="bg-[#0D0D0D] h-6 w-6 rounded-full border border-[#BCBEC0] border-opacity-50 cursor-pointer"/>
+          <IoMdPersonAdd size={24} className="bg-[#0D0D0D] h-6 w-6 rounded-full border border-[#BCBEC0] border-opacity-50 cursor-pointer" onClick={openUserPopup} />
+          <BsPeopleFill size={24} className="bg-[#0D0D0D] h-6 w-6 rounded-full border border-[#BCBEC0] border-opacity-50 cursor-pointer" onClick={openGroupPopup} />
         </div>
         <div className="w-full flex justify-center items-center ">
           <input
@@ -151,7 +166,8 @@ const SideBar = ({ onUserClick }) => {
           </div>
         </div>
       </div>
-      {isPopupOpen && <UserSearchCreate onClose={closePopup}  onChatCreated={handleChatCreated}/>}
+      {isUserPopupOpen && <UserSearchCreate onClose={closeUserPopup} onChatCreated={handleChatCreated} />}
+      {isGroupPopupOpen && <GroupSearchCreate onClose={closeGroupPopup} onGroupCreated={handleGroupCreated} />}
     </div>
   );
 };

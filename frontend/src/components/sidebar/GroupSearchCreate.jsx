@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import axios from '../../axiosInstance.jsx'; 
 import { IoClose } from 'react-icons/io5';
+import { IoRemoveCircleOutline } from 'react-icons/io5';
 
 const GroupSearchCreate = ({ onClose, onGroupCreated }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [groupName, setGroupName] = useState(''); 
+  
   const handleSearchChange = async (event) => {
     const query = event.target.value;
     setSearchQuery(query);
@@ -13,7 +16,6 @@ const GroupSearchCreate = ({ onClose, onGroupCreated }) => {
     if (query) {
       try {
         const response = await axios.post('/users/u/search', { searchTerm: query });
-        console.log(response.data.data)
         setSearchResults(response.data.data);
       } catch (error) {
         console.error('Error searching users:', error);
@@ -23,12 +25,32 @@ const GroupSearchCreate = ({ onClose, onGroupCreated }) => {
     }
   };
 
-  const handleUserClick = async (user) => {
+  const handleUserClick = (user) => {
+    if (!selectedUsers.some(selected => selected._id === user._id)) {
+      setSelectedUsers([...selectedUsers, user]);
+    }
+  };
+
+  const handleRemoveUser = (userId) => {
+    setSelectedUsers(selectedUsers.filter(user => user._id !== userId));
+  };
+
+  const handleCreateGroup = async () => {
+    if (!groupName.trim()) {
+      alert('Please enter a group name.');
+      return;
+    }
+
+    const usernames = selectedUsers.map(user => user.username);
+
     try {
-      const response = await axios.post('/groups/create', { participants: [user.username] });
+      const response = await axios.post('/groups/group', { 
+        name: groupName,
+        participants: usernames 
+      });
       console.log(response.data.data);
-      onGroupCreated(); // Notify parent component about the successful creation
-      onClose(); // Close the popup
+      onGroupCreated();
+      onClose();
     } catch (error) {
       console.error('Error creating group:', error);
     }
@@ -64,6 +86,45 @@ const GroupSearchCreate = ({ onClose, onGroupCreated }) => {
             <p>No users found.</p>
           )}
         </div>
+        <div className="mt-4">
+          {selectedUsers.length > 0 && (
+            <>
+              <h3 className="text-md font-semibold mb-2">Selected Users:</h3>
+              <div className="flex flex-wrap gap-2">
+                {selectedUsers.map(user => (
+                  <div
+                    key={user._id}
+                    className="flex items-center p-2 border border-[#BCBEC0] rounded-md bg-gray-100"
+                  >
+                    <p className="mr-2">{user.username}</p>
+                    <IoRemoveCircleOutline
+                      className="text-red-500 cursor-pointer"
+                      size={18}
+                      onClick={() => handleRemoveUser(user._id)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+        <div className="mt-4">
+          <input
+            type="text"
+            className="w-full h-8 rounded-md px-4 border border-[#BCBEC0] focus:border-primaryDark focus:outline-none text-sm border-opacity-50"
+            placeholder="Group name..."
+            value={groupName}
+            onChange={(e) => setGroupName(e.target.value)}
+          />
+        </div>
+        {selectedUsers.length > 0 && (
+          <button
+            onClick={handleCreateGroup}
+            className="mt-4 bg-primaryDark text-white px-4 py-2 rounded-md hover:bg-primaryDarkDarker"
+          >
+            Create Group
+          </button>
+        )}
       </div>
     </div>
   );

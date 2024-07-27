@@ -13,7 +13,6 @@ const UserSearchCreate = ({ onClose, onChatCreated }) => {
     if (query) {
       try {
         const response = await axios.post('/users/u/search', { searchTerm: query });
-        console.log(response.data.data)
         setSearchResults(response.data.data);
       } catch (error) {
         console.error('Error searching users:', error);
