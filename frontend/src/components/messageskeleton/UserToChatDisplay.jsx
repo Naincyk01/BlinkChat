@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from '../../axiosInstance.jsx';
 import io from 'socket.io-client';
 
-const UserToChatDisplay = ({ user, onClick }) => {
+const UserToChatDisplay = ({ user, onClick,isGroup }) => {
   const [latestMessage, setLatestMessage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -33,16 +33,16 @@ const UserToChatDisplay = ({ user, onClick }) => {
     const socket = io('http://localhost:9000');
 
     socket.on('connect', () => {
+  
       if (user._id) {
         socket.emit('joinRoom', user._id);
       }
     });
 
     socket.on('message', (message) => {
-      if (message.groupId === user._id) {
+      if ((message.groupId === user._id) ) {
         // Update the latest message
         setLatestMessage(message);
-        console.log(message)
       }
     });
 
@@ -91,10 +91,12 @@ const UserToChatDisplay = ({ user, onClick }) => {
     >
       <div className='flex gap-x-3'>
         <div className="border h-14 rounded-full w-14 flex justify-center items-center">
-          <img src={user.profilepic} className="h-full w-full rounded-full" alt="Profile Picture" />
+          <img src={isGroup ?"": user.profilepic} className="h-full w-full rounded-full" alt="picture" />
         </div>
         <div className="flex flex-col">
-          <h3 className="text-lg font-semibold">{user.fullName}</h3>
+        <h3 className="text-lg font-semibold">
+            {isGroup ? user.name : user.fullName}
+          </h3>
           <p className="text-sm text-gray-500">{truncatedContent}</p>
         </div>
       </div>

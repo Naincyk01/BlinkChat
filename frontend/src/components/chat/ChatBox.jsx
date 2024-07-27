@@ -6,7 +6,21 @@ import SingleMessage from '../messageskeleton/SingleMessage.jsx';
 const ChatBox = ({ selectedUser }) => {
   const [messages, setMessages] = useState([]);
   const [currentMessage, setCurrentMessage] = useState('');
+  const [currentUser, setCurrentUser] = useState(null);
   const socketRef = useRef(null);
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await axios.get('/users/');
+        setCurrentUser(response.data.data);
+      } catch (error) {
+        console.error('Error fetching current user:', error);
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
 
   useEffect(() => {
     const fetchPreviousMessages = async () => {
@@ -73,7 +87,7 @@ const ChatBox = ({ selectedUser }) => {
         <div className="flex items-start pb-3 border-b border-gray-600 p-4">
           <div className="border h-14 rounded-full w-14 bg-gray-600">
             <img
-              src={selectedUser.profilepic}
+              src={isGroupChat ? '':selectedUser.profilepic}
               className="h-full w-full rounded-full"
               alt="Profile Picture"
             />
@@ -86,11 +100,12 @@ const ChatBox = ({ selectedUser }) => {
 
         <div className="flex-1 overflow-y-auto mb-3 p-4 scrollbar-hidden">
           {messages.map(message => {
+           
             return (
               <SingleMessage
                 key={message._id}
                 message={message}
-                isOwnMessage={message.sender.fullName === selectedUser.fullName}
+                isOwnMessage={message.sender._id === currentUser._id}
               />
             );
           })}
