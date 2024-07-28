@@ -22,15 +22,15 @@ router.get('/:groupId', getMessages);
 router.get('/message/:messageId', getMessageByMessageId);
 
 
+
+
 router.delete('/:messageId', deleteMessage);
-
-
 router.put('/:messageId', updateMessage);
-
-
 router.put('/mark-read/:messageId', markMessageAsRead);
-
-
 router.get('/unread-count', getUnreadMessagesCount);
+
+
+
+
 
 export default router;

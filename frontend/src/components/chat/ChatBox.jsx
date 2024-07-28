@@ -1,16 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from '../../axiosInstance.jsx';
 import io from 'socket.io-client';
-import { useNavigate } from 'react-router-dom'; 
 import SingleMessage from '../messageskeleton/SingleMessage.jsx';
-import { CiMenuKebab } from "react-icons/ci";
+import { CiMenuKebab } from 'react-icons/ci';
+import GroupSetting from './GroupSetting.jsx';
+import { FaEye } from 'react-icons/fa';
 
 const PopupMenu = ({ onDeleteGroup }) => {
   return (
-    <div className="absolute top-16 right-4 bg-gray-800 border border-gray-600 rounded-lg shadow-lg z-10">
-      <button 
+    <div className="absolute top-18 right-8 bg-primary border border-gray-600 rounded-lg shadow-lg z-10">
+      <button
         onClick={onDeleteGroup}
-        className="block px-4 py-2 text-white hover:bg-gray-700 w-full text-left"
+        className="block px-4 py-2 text-white rounded-lg hover:bg-gray-700 w-full text-left"
       >
         Delete Group
       </button>
@@ -24,6 +25,7 @@ const ChatBox = ({ selectedUser }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const socketRef = useRef(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [showGroupSettings, setShowGroupSettings] = useState(false);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -98,6 +100,10 @@ const ChatBox = ({ selectedUser }) => {
     setShowPopup(prev => !prev);
   };
 
+  const handleGroupSettingsToggle = () => {
+    setShowGroupSettings(prev => !prev);
+  };
+
   const handleDeleteGroup = async () => {
     try {
       await axios.delete(`/groups/${selectedUser._id}`); // API call to delete group
@@ -107,7 +113,6 @@ const ChatBox = ({ selectedUser }) => {
     }
   };
 
-
   const isGroupChat = selectedUser.type === 'group';
   const headerTitle = isGroupChat ? selectedUser.name : selectedUser.fullName;
   const headerSubtitle = isGroupChat ? `${selectedUser.participants.length} members` : 'online';
@@ -115,31 +120,40 @@ const ChatBox = ({ selectedUser }) => {
     <div className="w-full h-screen bg-chatBg p-4 flex">
       <div className="flex flex-col w-full h-full bg-[#0D0D0D] border border-primaryLight border-opacity-50 rounded-xl gap-2">
         {/* Top section: Receiver's info */}
-        <div className="flex items-start pb-3 border-b border-gray-600 p-4">
-          <div className="border h-14 rounded-full w-14 bg-gray-600">
-            <img
-              src={isGroupChat ? '':selectedUser.profilepic}
-              className="h-full w-full rounded-full"
-              alt="Profile Picture"
-            />
+
+        <div className="flex justify-between border-b border-gray-600 p-4">
+          <div className="flex w-40 h-14 gap-x-4">
+            <div className="border h-14 w-14 rounded-full">
+              <img
+                src={isGroupChat ? '' : selectedUser.profilepic}
+                className="h-full w-full rounded-full bg-gray-800"
+                alt=""
+              />
+            </div>
+            <div className="flex flex-col">
+              <h3 className="text-lg font-semibold text-white">{headerTitle}</h3>
+              <p className="text-sm text-gray-400">{headerSubtitle}</p>
+            </div>
           </div>
-          <div className="flex flex-col pl-2">
-            <h3 className="text-lg font-semibold text-white">{headerTitle}</h3>
-            <p className="text-sm text-gray-400">{headerSubtitle}</p>
-          </div>
-          <div>
-          <button onClick={handlePopupToggle} className="ml-auto text-gray-40 hover:text-white" >
-          <CiMenuKebab />
-          </button>
-          {showPopup && (
-            <PopupMenu onDeleteGroup={handleDeleteGroup} />
-          )}
+
+          <div className="">
+            {isGroupChat && (
+              <button onClick={handleGroupSettingsToggle} className="text-gray-400">
+                <FaEye />
+              </button>
+            )}
+            <button onClick={handlePopupToggle} className="text-gray-400">
+              <CiMenuKebab />
+            </button>
+            {showPopup && <PopupMenu onDeleteGroup={handleDeleteGroup} />}
+            {showGroupSettings && (
+              <GroupSetting group={selectedUser} onClose={handleGroupSettingsToggle} />
+            )}
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto mb-3 p-4 scrollbar-hidden">
           {messages.map(message => {
-           
             return (
               <SingleMessage
                 key={message._id}
