@@ -21,10 +21,10 @@ router.use(verifyJWT);
 router.post('/one',  createOneToOneConversation);
 router.post('/group',  createGroupConversation);
 
+router.delete('/:groupId', deleteGroup);
 router.put('/:groupId', updateGroup);
 router.put('/:groupId/participants', addParticipants);
 router.delete('/:groupId/participants/:participantId', removeParticipant);
-router.delete('/:groupId', deleteGroup);
 router.delete('/:groupId/leave', leaveGroup);
 
 

@@ -86,6 +86,7 @@ const createGroupConversation = asyncHandler(async (req, res) => {
 
 
 
+
 const addParticipants = asyncHandler(async (req, res) => {
     const { groupId } = req.params;
     const { participants } = req.body; // participants is expected to be an array even if single participant
@@ -300,7 +301,6 @@ const findOneByUser = asyncHandler(async (req, res) => {
         success: true
     });
 });
-
 
 
 const getGroupConversations = asyncHandler(async (req, res) => {

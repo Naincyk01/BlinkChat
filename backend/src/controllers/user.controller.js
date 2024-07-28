@@ -248,7 +248,7 @@ const searchUsers = asyncHandler(async (req, res) => {
     });
   });
   
-  const getAllUsers = asyncHandler(async (req, res) => {
+const getAllUsers = asyncHandler(async (req, res) => {
     const users = await User.find({}).select('-password -refreshToken');
   
     if (!users || users.length === 0) {

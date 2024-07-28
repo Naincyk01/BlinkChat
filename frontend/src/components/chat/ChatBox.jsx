@@ -1,13 +1,29 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from '../../axiosInstance.jsx';
 import io from 'socket.io-client';
+import { useNavigate } from 'react-router-dom'; 
 import SingleMessage from '../messageskeleton/SingleMessage.jsx';
+import { CiMenuKebab } from "react-icons/ci";
+
+const PopupMenu = ({ onDeleteGroup }) => {
+  return (
+    <div className="absolute top-16 right-4 bg-gray-800 border border-gray-600 rounded-lg shadow-lg z-10">
+      <button 
+        onClick={onDeleteGroup}
+        className="block px-4 py-2 text-white hover:bg-gray-700 w-full text-left"
+      >
+        Delete Group
+      </button>
+    </div>
+  );
+};
 
 const ChatBox = ({ selectedUser }) => {
   const [messages, setMessages] = useState([]);
   const [currentMessage, setCurrentMessage] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
   const socketRef = useRef(null);
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -77,6 +93,21 @@ const ChatBox = ({ selectedUser }) => {
   const handleInputChange = e => {
     setCurrentMessage(e.target.value);
   };
+
+  const handlePopupToggle = () => {
+    setShowPopup(prev => !prev);
+  };
+
+  const handleDeleteGroup = async () => {
+    try {
+      await axios.delete(`/groups/${selectedUser._id}`); // API call to delete group
+      window.location.reload(); // Redirect to chat interface page
+    } catch (error) {
+      console.error('Error deleting group:', error);
+    }
+  };
+
+
   const isGroupChat = selectedUser.type === 'group';
   const headerTitle = isGroupChat ? selectedUser.name : selectedUser.fullName;
   const headerSubtitle = isGroupChat ? `${selectedUser.participants.length} members` : 'online';
@@ -95,6 +126,14 @@ const ChatBox = ({ selectedUser }) => {
           <div className="flex flex-col pl-2">
             <h3 className="text-lg font-semibold text-white">{headerTitle}</h3>
             <p className="text-sm text-gray-400">{headerSubtitle}</p>
+          </div>
+          <div>
+          <button onClick={handlePopupToggle} className="ml-auto text-gray-40 hover:text-white" >
+          <CiMenuKebab />
+          </button>
+          {showPopup && (
+            <PopupMenu onDeleteGroup={handleDeleteGroup} />
+          )}
           </div>
         </div>
 
