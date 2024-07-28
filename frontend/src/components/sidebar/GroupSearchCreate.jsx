@@ -57,28 +57,30 @@ const GroupSearchCreate = ({ onClose, onGroupCreated }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div className="bg-white text-black p-4 rounded-lg shadow-lg w-1/3 max-w-lg">
-        <div className="flex justify-between items-center mb-4">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" onClick={onClose}>
+
+      <div className="bg-primaryLight text-white border border-gray-300 p-4 rounded-lg shadow-lg w-1/3 max-w-lg flex flex-col gap-5"  onClick={(e) => e.stopPropagation()}>
+
+        <div className="flex justify-between items-center">
           <h2 className="text-lg font-semibold">Search Users to Create Group</h2>
           <IoClose className="cursor-pointer" size={24} onClick={onClose} />
         </div>
         <input
           type="text"
-          className="w-full h-8 rounded-md px-4 border border-[#BCBEC0] focus:border-primaryDark focus:outline-none text-sm border-opacity-50"
+          className="w-full h-8 rounded-md px-4 border text-gray-700  border-[#BCBEC0] focus:border-gray-800 focus:outline-none text-sm border-opacity-50"
           placeholder="Search users..."
           value={searchQuery}
           onChange={handleSearchChange}
         />
-        <div className="mt-4 max-h-60 overflow-y-auto">
+        <div className="max-h-60 overflow-y-auto">
           {searchResults.length > 0 ? (
             searchResults.map(user => (
               <div
                 key={user._id}
-                className="p-2 border-b border-[#BCBEC0] cursor-pointer hover:bg-gray-200"
+                className="p-2 border-b border-[#BCBEC0] cursor-pointer hover:bg-[#CDE1FD]"
                 onClick={() => handleUserClick(user)}
               >
-                <p className="text-black">{user.username}</p>
+                <p className="text-white">{user.username}</p>
                 <p className="text-gray-600 text-sm">{user.fullName}</p>
               </div>
             ))
@@ -86,7 +88,7 @@ const GroupSearchCreate = ({ onClose, onGroupCreated }) => {
             <p>No users found.</p>
           )}
         </div>
-        <div className="mt-4">
+        <div className="text-white">
           {selectedUsers.length > 0 && (
             <>
               <h3 className="text-md font-semibold mb-2">Selected Users:</h3>
@@ -94,7 +96,7 @@ const GroupSearchCreate = ({ onClose, onGroupCreated }) => {
                 {selectedUsers.map(user => (
                   <div
                     key={user._id}
-                    className="flex items-center p-2 border border-[#BCBEC0] rounded-md bg-gray-100"
+                    className="flex items-center text-gray-700 p-2 border border-[#BCBEC0] rounded-md bg-gray-100"
                   >
                     <p className="mr-2">{user.username}</p>
                     <IoRemoveCircleOutline
@@ -108,10 +110,10 @@ const GroupSearchCreate = ({ onClose, onGroupCreated }) => {
             </>
           )}
         </div>
-        <div className="mt-4">
+        <div className="">
           <input
             type="text"
-            className="w-full h-8 rounded-md px-4 border border-[#BCBEC0] focus:border-primaryDark focus:outline-none text-sm border-opacity-50"
+            className="w-full h-8 rounded-md px-4 border border-[#BCBEC0] focus:border-gray-800 text-gray-700 focus:outline-none text-sm border-opacity-50"
             placeholder="Group name..."
             value={groupName}
             onChange={(e) => setGroupName(e.target.value)}
@@ -120,12 +122,14 @@ const GroupSearchCreate = ({ onClose, onGroupCreated }) => {
         {selectedUsers.length > 0 && (
           <button
             onClick={handleCreateGroup}
-            className="mt-4 bg-primaryDark text-white px-4 py-2 rounded-md hover:bg-primaryDarkDarker"
+            className="mt-4 bg-primaryDark text-white px-4 py-2 rounded-md hover:bg-primary"
           >
             Create Group
           </button>
         )}
+
       </div>
+
     </div>
   );
 };

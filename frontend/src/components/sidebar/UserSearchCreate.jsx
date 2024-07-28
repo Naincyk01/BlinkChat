@@ -34,28 +34,31 @@ const UserSearchCreate = ({ onClose, onChatCreated }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div className="bg-white text-black p-4 rounded-lg shadow-lg w-1/3 max-w-lg">
-        <div className="flex justify-between items-center mb-4">
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50" onClick={onClose}>
+
+      <div className="text-white p-4 rounded-lg shadow-lg w-1/3 max-w-lg border border-gray-400 flex flex-col gap-4 bg-primaryLight"   onClick={(e) => e.stopPropagation()}> 
+
+        <div className="flex justify-between items-center">
           <h2 className="text-lg font-semibold">Search Users</h2>
           <IoClose className="cursor-pointer" size={24} onClick={onClose} />
         </div>
+
         <input
           type="text"
-          className="w-full h-8 rounded-md px-4 border border-[#BCBEC0] focus:border-primaryDark focus:outline-none text-sm border-opacity-50"
+          className="w-full h-8 text-gray-700 rounded-md px-4 border border-[#BCBEC0] focus:border-gray-900 focus:outline-none text-sm border-opacity-50"
           placeholder="Search users..."
           value={searchQuery}
           onChange={handleSearchChange}
         />
-        <div className="mt-4 max-h-60 overflow-y-auto">
+        <div className="max-h-60 overflow-y-auto">
           {searchResults.length > 0 ? (
             searchResults.map(user => (
               <div
                 key={user._id}
-                className="p-2 border-b border-[#BCBEC0] cursor-pointer hover:bg-gray-200"
+                className="p-2 border-b border-[#BCBEC0] cursor-pointer hover:bg-[#CDE1FD]"
                 onClick={() => handleUserClick(user)}
               >
-                <p className="text-black">{user.username}</p>
+                <p className="text-white">{user.username}</p>
                 <p className="text-gray-600 text-sm">{user.fullName}</p>
               </div>
             ))
@@ -63,7 +66,9 @@ const UserSearchCreate = ({ onClose, onChatCreated }) => {
             <p>No users found.</p>
           )}
         </div>
+
       </div>
+
     </div>
   );
 };
