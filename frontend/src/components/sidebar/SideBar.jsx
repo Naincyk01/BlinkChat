@@ -3,8 +3,8 @@ import axios from '../../axiosInstance.jsx';
 import UserToChatDisplay from '../messageskeleton/UserToChatDisplay.jsx';
 import { IoMenu } from 'react-icons/io5';
 import SidebarContent from './SideBarContent.jsx';
-import { IoMdPersonAdd } from "react-icons/io";
-import { BsPeopleFill } from "react-icons/bs";
+import { IoMdPersonAdd } from 'react-icons/io';
+import { BsPeopleFill } from 'react-icons/bs';
 import UserSearchCreate from './UserSearchCreate.jsx';
 import GroupSearchCreate from './GroupSearchCreate.jsx';
 
@@ -15,8 +15,7 @@ const SideBar = ({ onUserClick }) => {
   const [filteredGroups, setFilteredGroups] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isUserPopupOpen, setIsUserPopupOpen] = useState(false);
-  const [isGroupPopupOpen, setIsGroupPopupOpen] = useState(false);
+  const [popupType, setPopupType] = useState(null); // `null`, `'user'`, or `'group'`
 
   useEffect(() => {
     fetchUsers();
@@ -78,30 +77,24 @@ const SideBar = ({ onUserClick }) => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const openUserPopup = () => {
-    setIsUserPopupOpen(true);
+  const openPopup = type => {
+    setPopupType(type);
   };
 
-  const closeUserPopup = () => {
-    setIsUserPopupOpen(false);
-  };
-
-  const openGroupPopup = () => {
-    setIsGroupPopupOpen(true);
-  };
-
-  const closeGroupPopup = () => {
-    setIsGroupPopupOpen(false);
+  const closePopup = () => {
+    setPopupType(null);
   };
 
   const handleChatCreated = () => {
     alert('Chat created successfully !');
     fetchUsers();
+    closePopup();
   };
 
   const handleGroupCreated = () => {
     alert('Group created successfully!');
     fetchGroups();
+    closePopup();
   };
 
   return (
@@ -111,10 +104,9 @@ const SideBar = ({ onUserClick }) => {
       </div>
       <div className="w-[350px] h-full flex flex-col pl-5 gap-4">
         <div className='flex justify-end gap-x-2'>
-          <IoMenu size={24} className="bg-[#0D0D0D] h-6 rounded-md border border-[#BCBEC0] border-opacity-50 cursor-pointer" onClick={toggleSidebar}
-          />
-          <IoMdPersonAdd size={24} className="bg-[#0D0D0D] h-6 w-6 rounded-full border border-[#BCBEC0] border-opacity-50 cursor-pointer" onClick={openUserPopup} />
-          <BsPeopleFill size={24} className="bg-[#0D0D0D] h-6 w-6 rounded-full border border-[#BCBEC0] border-opacity-50 cursor-pointer" onClick={openGroupPopup} />
+          <IoMenu size={24} className="bg-[#0D0D0D] h-6 rounded-md border border-[#BCBEC0] border-opacity-50 cursor-pointer" onClick={toggleSidebar} />
+          <IoMdPersonAdd size={24} className="bg-[#0D0D0D] h-6 w-6 rounded-full border border-[#BCBEC0] border-opacity-50 cursor-pointer" onClick={() => openPopup('user')} />
+          <BsPeopleFill size={24} className="bg-[#0D0D0D] h-6 w-6 rounded-full border border-[#BCBEC0] border-opacity-50 cursor-pointer" onClick={() => openPopup('group')} />
         </div>
         <div className="w-full flex justify-center items-center ">
           <input
@@ -125,30 +117,24 @@ const SideBar = ({ onUserClick }) => {
             onChange={handleSearchChange}
           />
         </div>
-        <div
-          className={`bg-[#0D0D0D] rounded-xl px-4 shadow-md border border-primaryLight border-opacity-50 h-[50%] overflow-y-auto ${filteredUsers.length > 0 ? 'scrollbar-hidden' : ''}`}
-        >
+        <div className={`bg-[#0D0D0D] rounded-xl px-4 shadow-md border border-primaryLight border-opacity-50 h-[50%] overflow-y-auto ${filteredUsers.length > 0 ? 'scrollbar-hidden' : ''}`}>
           <div className="text-white font-semibold py-2">People</div>
           <div className="flex flex-col gap-2 ">
             {Array.isArray(filteredUsers) && filteredUsers.length > 0 ? (
-              filteredUsers.map(user => {
-                return (
-                  <UserToChatDisplay
-                    key={user._id}
-                    user={user}
-                    onClick={() => onUserClick(user)}
-                    isGroup={false}
-                  />
-                );
-              })
+              filteredUsers.map(user => (
+                <UserToChatDisplay
+                  key={user._id}
+                  user={user}
+                  onClick={() => onUserClick(user)}
+                  isGroup={false}
+                />
+              ))
             ) : (
               <p>No users found.</p>
             )}
           </div>
         </div>
-        <div
-          className={`bg-[#0D0D0D] rounded-xl px-4 shadow-md border border-primaryLight border-opacity-50 h-[50%] overflow-y-auto ${filteredGroups.length > 0 ? 'scrollbar-hidden' : ''}`}
-        >
+        <div className={`bg-[#0D0D0D] rounded-xl px-4 shadow-md border border-primaryLight border-opacity-50 h-[50%] overflow-y-auto ${filteredGroups.length > 0 ? 'scrollbar-hidden' : ''}`}>
           <div className="text-white font-semibold py-2">Groups</div>
           <div className="flex flex-col gap-2">
             {Array.isArray(filteredGroups) && filteredGroups.length > 0 ? (
@@ -166,8 +152,8 @@ const SideBar = ({ onUserClick }) => {
           </div>
         </div>
       </div>
-      {isUserPopupOpen && <UserSearchCreate onClose={closeUserPopup} onChatCreated={handleChatCreated} />}
-      {isGroupPopupOpen && <GroupSearchCreate onClose={closeGroupPopup} onGroupCreated={handleGroupCreated} />}
+      {popupType === 'user' && <UserSearchCreate onClose={closePopup} onChatCreated={handleChatCreated} />}
+      {popupType === 'group' && <GroupSearchCreate onClose={closePopup} onGroupCreated={handleGroupCreated} />}
     </div>
   );
 };

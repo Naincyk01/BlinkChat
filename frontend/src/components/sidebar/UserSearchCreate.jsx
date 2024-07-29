@@ -27,7 +27,6 @@ const UserSearchCreate = ({ onClose, onChatCreated }) => {
       const response = await axios.post('/groups/one', { participant:user.username});
       console.log(response.data.data)
         onChatCreated(); // Notify parent component about the successful creation
-        onClose(); // Close the popup
     } catch (error) {
       console.error('Error creating chat:', error);
     }

@@ -50,7 +50,6 @@ const GroupSearchCreate = ({ onClose, onGroupCreated }) => {
       });
       console.log(response.data.data);
       onGroupCreated();
-      onClose();
     } catch (error) {
       console.error('Error creating group:', error);
     }

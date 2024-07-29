@@ -1,4 +1,3 @@
-// src/components/GroupSettingsPopup.jsx
 import React, { useState, useEffect } from 'react';
 import axios from '../../axiosInstance.jsx';
 import { IoClose } from "react-icons/io5";
@@ -6,9 +5,9 @@ import { IoClose } from "react-icons/io5";
 const GroupSettingsPopup = ({ group, onClose }) => {
   const [participants, setParticipants] = useState([]);
   const [newGroupName, setNewGroupName] = useState(group.name || '');
-  const [newParticipant, setNewParticipant] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const [selectedParticipants, setSelectedParticipants] = useState([]);
 
   useEffect(() => {
     // Fetch participants
@@ -29,7 +28,7 @@ const GroupSettingsPopup = ({ group, onClose }) => {
       // Search users
       const fetchSearchResults = async () => {
         try {
-          const response = await axios.get(`/users/u/search/searchUsers?query=${searchQuery}`);
+          const response = await axios.post('/users/u/search/searchUsers', { searchTerm: searchQuery });
           setSearchResults(response.data.data);
         } catch (error) {
           console.error('Error searching users:', error);
@@ -51,25 +50,25 @@ const GroupSettingsPopup = ({ group, onClose }) => {
     }
   };
 
-  const handleAddParticipant = async (userId) => {
+  const handleAddParticipants = async () => {
     try {
-      await axios.post(`/groups/${group._id}/participants`, { userId });
-      setNewParticipant(''); // Clear the input field
+      for (const userId of selectedParticipants) {
+        await axios.post(`/groups/${group._id}/participants`, { userId });
+      }
+      setSelectedParticipants([]); // Clear the selected participants list
       setSearchQuery(''); // Clear search query
-      // Re-fetch participants after adding a new one
+      // Re-fetch participants after adding
       const response = await axios.get(`/groups/${group._id}/participants`);
       setParticipants(response.data.data);
-      alert('Participant added!');
+      alert('Participants added!');
     } catch (error) {
-      console.error('Error adding participant:', error);
+      console.error('Error adding participants:', error);
     }
   };
 
   const handleRemoveParticipant = async (userId) => {
     try {
-      // Remove participant from the server
       await axios.delete(`/groups/${group._id}/participants/${userId}`);
-      // Remove participant from local state
       setParticipants(participants.filter(participant => participant._id !== userId));
       alert('Participant removed!');
     } catch (error) {
@@ -87,10 +86,27 @@ const GroupSettingsPopup = ({ group, onClose }) => {
     }
   };
 
+  const handleSelectParticipant = (user) => {
+    if (!selectedParticipants.includes(user._id)) {
+      setSelectedParticipants([...selectedParticipants, user._id]);
+    }
+  };
+
+  const handleBlur = () => {
+    if (newGroupName !== group.name) {
+      handleUpdateGroupName();
+    }
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      handleUpdateGroupName();
+    }
+  };
+
   return (
     <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-20">
       <div className="bg-primary rounded-lg p-6 relative">
-
         <button onClick={onClose} className="absolute top-2 right-2 text-gray-600">
           <IoClose />
         </button>
@@ -98,11 +114,11 @@ const GroupSettingsPopup = ({ group, onClose }) => {
         
         <div className="mb-4">
           <h4 className="text-lg font-medium mb-2">Participants</h4>
-          <div className="flex overflow-x-auto space-x-4 p-2">
+          <div className="flex gap-x-4">
             {participants.map(participant => (
               <div
                 key={participant._id}
-                className="flex items-center border-r border-gray-300 pr-4 last:border-r-0"
+                className="flex items-center border text-black border-gray-300 rounded-md p-1 bg-yellow-100"
               >
                 <span>{participant.fullName}</span>
                 <button className="text-red-500 ml-2" onClick={() => handleRemoveParticipant(participant._id)}>
@@ -110,6 +126,19 @@ const GroupSettingsPopup = ({ group, onClose }) => {
                 </button>
               </div>
             ))}
+            {selectedParticipants.length > 0 && (
+              <div className="mt-4 border-t border-gray-300 pt-2">
+                <h5 className="text-lg font-medium mb-2">Selected Participants</h5>
+                {searchResults.filter(user => selectedParticipants.includes(user._id)).map(user => (
+                  <div
+                    key={user._id}
+                    className="flex items-center border-r border-gray-300 pr-4 last:border-r-0"
+                  >
+                    <span>{user.fullName}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
         <div className="mb-4 flex items-center">
@@ -119,6 +148,8 @@ const GroupSettingsPopup = ({ group, onClose }) => {
             className="border p-2 rounded-l w-full text-gray-700"
             value={newGroupName}
             onChange={(e) => setNewGroupName(e.target.value)}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
           />
           <button
             onClick={handleUpdateGroupName}
@@ -138,15 +169,20 @@ const GroupSettingsPopup = ({ group, onClose }) => {
           {searchResults.length > 0 && (
             <div className="border border-gray-300 rounded mt-2 bg-white">
               {searchResults.map(user => (
-                <div key={user._id} className="flex items-center justify-between p-2 hover:bg-gray-100 cursor-pointer" onClick={() => handleAddParticipant(user._id)}>
+                <div key={user._id} className="flex items-center justify-between p-2 hover:bg-gray-100 cursor-pointer" onClick={() => handleSelectParticipant(user)}>
                   <span>{user.fullName}</span>
-                  <button className="bg-blue-500 text-white px-2 py-1 rounded">Add</button>
                 </div>
               ))}
             </div>
           )}
         </div>
-        <button onClick={handleLeaveGroup} className="bg-red-500 text-white p-2 rounded w-full">
+        <button
+          onClick={handleAddParticipants}
+          className="bg-blue-500 text-white p-2 rounded w-full"
+        >
+          Add Participants
+        </button>
+        <button onClick={handleLeaveGroup} className="bg-red-500 text-white p-2 rounded w-full mt-2">
           Leave Group
         </button>
       </div>

@@ -8,7 +8,7 @@ import { FaEye } from 'react-icons/fa';
 
 const PopupMenu = ({ onDeleteGroup }) => {
   return (
-    <div className="absolute top-18 right-8 bg-primary border border-gray-600 rounded-lg shadow-lg z-10">
+    <div className="absolute right-8 top-20 bg-primary border border-gray-600 rounded-lg shadow-lg z-10">
       <button
         onClick={onDeleteGroup}
         className="block px-4 py-2 text-white rounded-lg hover:bg-gray-700 w-full text-left"
@@ -136,7 +136,7 @@ const ChatBox = ({ selectedUser }) => {
             </div>
           </div>
 
-          <div className="">
+          <div className="flex justify-center gap-x-3">
             {isGroupChat && (
               <button onClick={handleGroupSettingsToggle} className="text-gray-400">
                 <FaEye />
