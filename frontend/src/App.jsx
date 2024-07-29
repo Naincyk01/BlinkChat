@@ -3,6 +3,7 @@ import { Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
 import Login from './pages/Login.jsx';
 import SignUp from './pages/SignUp.jsx';
 import ChatInterface from './pages/ChatInterface.jsx';
+import { ChatProvider } from './context/ChatContext.jsx';
 
 const AppLayout = () => {
   return (
@@ -35,10 +36,12 @@ const appRouter = createBrowserRouter([
 
 const App = () => {
   return (
-  
+  <ChatProvider>
     <RouterProvider router={appRouter}>
       <AppLayout />
     </RouterProvider>
+
+  </ChatProvider>
     
   )
 }

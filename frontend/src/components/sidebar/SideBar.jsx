@@ -1,3 +1,4 @@
+import { useChatContext } from '../../context/ChatContext.jsx';
 import React, { useEffect, useState } from 'react';
 import axios from '../../axiosInstance.jsx';
 import UserToChatDisplay from '../messageskeleton/UserToChatDisplay.jsx';
@@ -9,9 +10,8 @@ import UserSearchCreate from './UserSearchCreate.jsx';
 import GroupSearchCreate from './GroupSearchCreate.jsx';
 
 const SideBar = ({ onUserClick }) => {
-  const [users, setUsers] = useState([]);
+  const { users, groups, refetchData } = useChatContext();
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [groups, setGroups] = useState([]);
   const [filteredGroups, setFilteredGroups] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -19,42 +19,23 @@ const SideBar = ({ onUserClick }) => {
   const [searchType, setSearchType] = useState('users'); // 'users' or 'groups'
 
   useEffect(() => {
-    fetchUsers();
-    fetchGroups();
-  }, []);
+    console.log("hello")
+    refetchData(); // Fetch data when component mounts or refetchData changes
+  }, [refetchData]);
 
-  const fetchUsers = async () => {
-    try {
-      const response = await axios.get('/groups/findone');
-      const userData = response.data.data;
-      setUsers(userData);
-      setFilteredUsers(userData);
-    } catch (error) {
-      console.error('Error fetching users:', error);
+  useEffect(() => {
+    if (searchType === 'users') {
+      filterUsers(searchQuery);
+    } else if (searchType === 'groups') {
+      filterGroups(searchQuery);
     }
-  };
+  }, [searchQuery, searchType, users, groups]);
 
-  const fetchGroups = async () => {
-    try {
-      const response = await axios.get('/groups/findgroup');
-      const groupData = response.data.data;
-      setGroups(groupData);
-      setFilteredGroups(groupData);
-    } catch (error) {
-      console.error('Error fetching groups:', error);
-    }
-  };
-
-  const handleSearchChange = event => {
+   const handleSearchChange = event => {
     const query = event.target.value;
     setSearchQuery(query);
-
-    if (searchType === 'users') {
-      filterUsers(query);
-    } else if (searchType === 'groups') {
-      filterGroups(query);
-    }
   };
+
 
   const filterUsers = query => {
     if (!query) {
@@ -92,13 +73,13 @@ const SideBar = ({ onUserClick }) => {
 
   const handleChatCreated = () => {
     alert('Chat created successfully !');
-    fetchUsers();
+    refetchData(); 
     closePopup();
   };
 
   const handleGroupCreated = () => {
     alert('Group created successfully!');
-    fetchGroups();
+    refetchData(); 
     closePopup();
   };
 
@@ -164,7 +145,6 @@ const SideBar = ({ onUserClick }) => {
           <div
             className={`bg-[#0D0D0D] rounded-xl px-4 shadow-md h-full border border-primaryLight border-opacity-50  overflow-y-auto ${filteredUsers.length > 0 ? 'scrollbar-hidden' : ''}`}
           >
-            <div className="text-white font-semibold py-2">People</div>
             <div className="flex flex-col gap-2 ">
               {Array.isArray(filteredUsers) && filteredUsers.length > 0 ? (
                 filteredUsers.map(user => (
@@ -185,7 +165,6 @@ const SideBar = ({ onUserClick }) => {
           <div
             className={`bg-[#0D0D0D] rounded-xl px-4 shadow-md border h-full border-primaryLight border-opacity-50 overflow-y-auto ${filteredGroups.length > 0 ? 'scrollbar-hidden' : ''}`}
           >
-            <div className="text-white font-semibold py-2">Groups</div>
             <div className="flex flex-col gap-2">
               {Array.isArray(filteredGroups) && filteredGroups.length > 0 ? (
                 filteredGroups.map(group => (

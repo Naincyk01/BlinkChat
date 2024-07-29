@@ -28,7 +28,7 @@ const GroupSettingsPopup = ({ group, onClose }) => {
       // Search users
       const fetchSearchResults = async () => {
         try {
-          const response = await axios.post('/users/u/search/searchUsers', { searchTerm: searchQuery });
+          const response = await axios.post('/users/u/search', { searchTerm: searchQuery });
           setSearchResults(response.data.data);
         } catch (error) {
           console.error('Error searching users:', error);
@@ -53,7 +53,7 @@ const GroupSettingsPopup = ({ group, onClose }) => {
   const handleAddParticipants = async () => {
     try {
       for (const userId of selectedParticipants) {
-        await axios.post(`/groups/${group._id}/participants`, { userId });
+        await axios.put(`/groups/${group._id}/participants`, {participants : userId });
       }
       setSelectedParticipants([]); // Clear the selected participants list
       setSearchQuery(''); // Clear search query
@@ -62,6 +62,7 @@ const GroupSettingsPopup = ({ group, onClose }) => {
       setParticipants(response.data.data);
       alert('Participants added!');
     } catch (error) {
+      console.log("hello")
       console.error('Error adding participants:', error);
     }
   };
@@ -110,9 +111,9 @@ const GroupSettingsPopup = ({ group, onClose }) => {
         <button onClick={onClose} className="absolute top-2 right-2 text-gray-600">
           <IoClose />
         </button>
-        <h3 className="text-xl font-semibold mb-4">Group Settings</h3>
+        <h3 className="text-xl font-semibold mb-2">Group Settings</h3>
         
-        <div className="mb-4">
+        <div className="mb-2">
           <h4 className="text-lg font-medium mb-2">Participants</h4>
           <div className="flex gap-x-4">
             {participants.map(participant => (
@@ -127,14 +128,14 @@ const GroupSettingsPopup = ({ group, onClose }) => {
               </div>
             ))}
             {selectedParticipants.length > 0 && (
-              <div className="mt-4 border-t border-gray-300 pt-2">
-                <h5 className="text-lg font-medium mb-2">Selected Participants</h5>
+              <div className=" border-gray-300">
                 {searchResults.filter(user => selectedParticipants.includes(user._id)).map(user => (
                   <div
                     key={user._id}
-                    className="flex items-center border-r border-gray-300 pr-4 last:border-r-0"
+                    className="flex items-center border bg-green-200 text-black rounded-md p-1 border-gray-300"
                   >
                     <span>{user.fullName}</span>
+                    <button className='text-red-500'> &#10005;</button>
                   </div>
                 ))}
               </div>
@@ -145,7 +146,7 @@ const GroupSettingsPopup = ({ group, onClose }) => {
           <input
             type="text"
             placeholder="Update group name"
-            className="border p-2 rounded-l w-full text-gray-700"
+            className="border p-2 rounded-md w-full text-gray-700"
             value={newGroupName}
             onChange={(e) => setNewGroupName(e.target.value)}
             onBlur={handleBlur}
@@ -153,24 +154,25 @@ const GroupSettingsPopup = ({ group, onClose }) => {
           />
           <button
             onClick={handleUpdateGroupName}
-            className="bg-green-500 text-white p-2 rounded-r ml-2"
+            className="bg-green-500 text-white p-2 rounded-md ml-2"
           >
             Update
           </button>
         </div>
-        <div className="mb-4">
+        <div className="flex flex-col gap-y-2 mb-2">
           <input
             type="text"
             placeholder="Search users"
-            className="border p-2 rounded w-full"
+            className="border p-2 rounded w-full text-black"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           {searchResults.length > 0 && (
-            <div className="border border-gray-300 rounded mt-2 bg-white">
+            <div className="rounded mt-2 text-black flex h-20 border border-[#BCBEC0] flex-col gap-y-2 overflow-y-auto scrollbar-hidden">
               {searchResults.map(user => (
-                <div key={user._id} className="flex items-center justify-between p-2 hover:bg-gray-100 cursor-pointer" onClick={() => handleSelectParticipant(user)}>
-                  <span>{user.fullName}</span>
+                <div key={user._id} className="flex flex-col p-2  border-b border-[#BCBEC0] cursor-pointer hover:bg-[#CDE1FD]" onClick={() => handleSelectParticipant(user)}>
+                  <p className="text-white">{user.username}</p>
+                  <p className="text-gray-600 text-sm">{user.fullName}</p>
                 </div>
               ))}
             </div>
@@ -178,7 +180,7 @@ const GroupSettingsPopup = ({ group, onClose }) => {
         </div>
         <button
           onClick={handleAddParticipants}
-          className="bg-blue-500 text-white p-2 rounded w-full"
+          className="bg-primaryLight text-white p-2 rounded w-full"
         >
           Add Participants
         </button>

@@ -19,7 +19,7 @@ const PopupMenu = ({ onDeleteGroup }) => {
   );
 };
 
-const ChatBox = ({ selectedUser }) => {
+const ChatBox = ({ selectedUser, onChatDeleted }) => {
   const [messages, setMessages] = useState([]);
   const [currentMessage, setCurrentMessage] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
@@ -107,7 +107,7 @@ const ChatBox = ({ selectedUser }) => {
   const handleDeleteGroup = async () => {
     try {
       await axios.delete(`/groups/${selectedUser._id}`); // API call to delete group
-      window.location.reload(); // Redirect to chat interface page
+      onChatDeleted();// Notify parent about deletion
     } catch (error) {
       console.error('Error deleting group:', error);
     }
