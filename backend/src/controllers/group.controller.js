@@ -202,8 +202,31 @@ const findOneByUser = asyncHandler(async (req, res) => {
         success: true
     });
 });
+const getParticipantsDetails = asyncHandler(async (req, res) => {
+    const { groupId } = req.params;
 
+    // Step 1: Find the group by ID
+    const group = await Group.findById(groupId);
 
+    if (!group) {
+        throw new apiError(404, "Group not found");
+    }
+
+    // Step 2: Extract participant IDs
+    const participantIds = group.participants;
+
+    // Step 3: Fetch participant details
+    const participants = await User.find({
+        _id: { $in: participantIds }
+    }).select('_id username fullName');
+
+    if (!participants || participants.length === 0) {
+        throw new apiError(404, "Participants not found");
+    }
+
+    // Return the participant details along with IDs
+    res.status(200).json(new apiResponse(200, participants, "Participants retrieved successfully"));
+});
 
 
 
@@ -307,32 +330,17 @@ const updateGroup = asyncHandler(async (req, res) => {
 });
 
 
-const getParticipantsDetails = asyncHandler(async (req, res) => {
+
+const getGroupDetailsById = asyncHandler(async (req, res) => {
     const { groupId } = req.params;
 
-    // Step 1: Find the group by ID
     const group = await Group.findById(groupId);
 
     if (!group) {
         throw new apiError(404, "Group not found");
     }
-
-    // Step 2: Extract participant IDs
-    const participantIds = group.participants;
-
-    // Step 3: Fetch participant details
-    const participants = await User.find({
-        _id: { $in: participantIds }
-    }).select('_id username fullName');
-
-    if (!participants || participants.length === 0) {
-        throw new apiError(404, "Participants not found");
-    }
-
-    // Return the participant details along with IDs
-    res.status(200).json(new apiResponse(200, participants, "Participants retrieved successfully"));
+    res.status(200).json(new apiResponse(200, group, "Group details retrieved successfully"));
 });
-
 
 
 export {
@@ -345,7 +353,8 @@ export {
     addParticipants,
     removeParticipant,
     leaveGroup,
-    updateGroup
+    updateGroup,
+    getGroupDetailsById
 };
 
 

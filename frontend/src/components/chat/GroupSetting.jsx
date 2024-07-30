@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../../axiosInstance.jsx';
 import { IoClose } from "react-icons/io5";
+import { useChatContext } from '../../context/ChatContext.jsx';
 
-const GroupSettingsPopup = ({ group, onClose }) => {
+const GroupSetting = ({ group, onClose }) => {
   const [participants, setParticipants] = useState([]);
   const [newGroupName, setNewGroupName] = useState(group.name || '');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [selectedParticipants, setSelectedParticipants] = useState([]);
+  const { refetchData } = useChatContext();
 
   useEffect(() => {
     // Fetch participants
@@ -45,6 +47,7 @@ const GroupSettingsPopup = ({ group, onClose }) => {
     try {
       await axios.put(`/groups/${group._id}`, { name: newGroupName });
       alert('Group name updated!');
+      refetchData();
     } catch (error) {
       console.error('Error updating group name:', error);
     }
@@ -61,8 +64,8 @@ const GroupSettingsPopup = ({ group, onClose }) => {
       const response = await axios.get(`/groups/${group._id}/participants`);
       setParticipants(response.data.data);
       alert('Participants added!');
+      refetchData();
     } catch (error) {
-      console.log("hello")
       console.error('Error adding participants:', error);
     }
   };
@@ -72,6 +75,7 @@ const GroupSettingsPopup = ({ group, onClose }) => {
       await axios.delete(`/groups/${group._id}/participants/${userId}`);
       setParticipants(participants.filter(participant => participant._id !== userId));
       alert('Participant removed!');
+      refetchData();
     } catch (error) {
       console.error('Error removing participant:', error);
     }
@@ -82,6 +86,7 @@ const GroupSettingsPopup = ({ group, onClose }) => {
       await axios.delete(`/groups/${group._id}/leave`);
       alert('You left the group!');
       onClose(); // Close the popup on leaving the group
+      refetchData(); // Refetch data from context
     } catch (error) {
       console.error('Error leaving group:', error);
     }
@@ -192,4 +197,4 @@ const GroupSettingsPopup = ({ group, onClose }) => {
   );
 };
 
-export default GroupSettingsPopup;
+export default GroupSetting;

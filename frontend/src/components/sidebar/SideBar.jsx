@@ -19,7 +19,6 @@ const SideBar = ({ onUserClick }) => {
   const [searchType, setSearchType] = useState('users'); // 'users' or 'groups'
 
   useEffect(() => {
-    console.log("hello")
     refetchData(); // Fetch data when component mounts or refetchData changes
   }, [refetchData]);
 

@@ -6,14 +6,15 @@ import { CiMenuKebab } from 'react-icons/ci';
 import GroupSetting from './GroupSetting.jsx';
 import { FaEye } from 'react-icons/fa';
 
-const PopupMenu = ({ onDeleteGroup }) => {
+
+const PopupMenu = ({ onDeleteGroup, isGroupChat }) => {
   return (
     <div className="absolute right-8 top-20 bg-primary border border-gray-600 rounded-lg shadow-lg z-10">
       <button
         onClick={onDeleteGroup}
         className="block px-4 py-2 text-white rounded-lg hover:bg-gray-700 w-full text-left"
       >
-        Delete Group
+        {isGroupChat ? 'Delete Group' : 'Delete'}
       </button>
     </div>
   );
@@ -27,6 +28,8 @@ const ChatBox = ({ selectedUser, onChatDeleted }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [showGroupSettings, setShowGroupSettings] = useState(false);
 
+
+  console.log(selectedUser)
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
@@ -116,6 +119,7 @@ const ChatBox = ({ selectedUser, onChatDeleted }) => {
   const isGroupChat = selectedUser.type === 'group';
   const headerTitle = isGroupChat ? selectedUser.name : selectedUser.fullName;
   const headerSubtitle = isGroupChat ? `${selectedUser.participants.length} members` : 'online';
+
   return (
     <div className="w-full h-screen bg-chatBg p-4 flex">
       <div className="flex flex-col w-full h-full bg-[#0D0D0D] border border-primaryLight border-opacity-50 rounded-xl gap-2">
@@ -145,7 +149,7 @@ const ChatBox = ({ selectedUser, onChatDeleted }) => {
             <button onClick={handlePopupToggle} className="text-gray-400">
               <CiMenuKebab />
             </button>
-            {showPopup && <PopupMenu onDeleteGroup={handleDeleteGroup} />}
+            {showPopup && <PopupMenu onDeleteGroup={handleDeleteGroup} isGroupChat={isGroupChat} />}
             {showGroupSettings && (
               <GroupSetting group={selectedUser} onClose={handleGroupSettingsToggle} />
             )}

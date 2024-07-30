@@ -9,7 +9,8 @@ import {
   removeParticipant,
   updateGroup,
   leaveGroup,
-  getParticipantsDetails 
+  getParticipantsDetails,
+  getGroupDetailsById
 } from '../controllers/group.controller.js';
 import { verifyJWT } from '../middlewares/auth.middleware.js'; 
 
@@ -25,6 +26,7 @@ router.delete('/:groupId', deleteGroup);
 router.get('/:groupId/participants', getParticipantsDetails);
 router.get('/findone', findOneByUser );
 router.get('/findgroup',getGroupConversations);
+router.get('/group/:groupId', getGroupDetailsById);
 
 router.put('/:groupId', updateGroup);
 router.put('/:groupId/participants', addParticipants);

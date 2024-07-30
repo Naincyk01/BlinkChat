@@ -48,7 +48,6 @@ const GroupSearchCreate = ({ onClose, onGroupCreated }) => {
         name: groupName,
         participants: usernames 
       });
-      console.log(response.data.data);
       onGroupCreated();
     } catch (error) {
       console.error('Error creating group:', error);
@@ -57,7 +56,6 @@ const GroupSearchCreate = ({ onClose, onGroupCreated }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" onClick={onClose}>
-
       <div className="bg-primaryLight text-white border border-gray-300 p-4 rounded-lg shadow-lg w-1/3 max-w-lg flex flex-col gap-5"  onClick={(e) => e.stopPropagation()}>
 
         <div className="flex justify-between items-center">
@@ -128,7 +126,6 @@ const GroupSearchCreate = ({ onClose, onGroupCreated }) => {
         )}
 
       </div>
-
     </div>
   );
 };

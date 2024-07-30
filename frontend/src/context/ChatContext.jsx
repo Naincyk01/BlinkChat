@@ -27,7 +27,6 @@ export const ChatProvider = ({ children }) => {
   }, []);
 
   const refetchData = useCallback(() => {
-    console.log("hello2")
     fetchUsers();
     fetchGroups();
   }, [fetchUsers, fetchGroups]);
