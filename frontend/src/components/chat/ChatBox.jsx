@@ -27,13 +27,15 @@ const ChatBox = ({ selectedUser, onChatDeleted }) => {
   const [fetchSelectedUser, setfetchSelectedUser] = useState(null);
   const socketRef = useRef(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [isRefetched, setIsRefetched] = useState(false);
   const [showGroupSettings, setShowGroupSettings] = useState(false);
 
   const fetchSelectedUserGroup = async () => {
     try {
       const response = await axios.get(`/groups/group/${selectedUser._id}`);
       const { data } = response.data;
-      setfetchSelectedUser(data); // Assuming you have a state setter for selectedUser
+      setfetchSelectedUser(data);
+      setIsRefetched(true); 
     } catch (error) {
       console.error('Error fetching selected user:', error);
     }
@@ -85,6 +87,12 @@ const ChatBox = ({ selectedUser, onChatDeleted }) => {
     };
   }, [selectedUser._id]);
 
+  useEffect(() => {
+    // Reset fetchSelectedUser and isRefetched when selectedUser changes
+    setfetchSelectedUser(null);
+    setIsRefetched(false);
+  }, [selectedUser._id]);
+  
   const sendMessage = async () => {
     if (!currentMessage.trim()) return; // Do not send empty messages
     try {
@@ -115,7 +123,8 @@ const ChatBox = ({ selectedUser, onChatDeleted }) => {
     if (showGroupSettings) {
       fetchSelectedUserGroup(); 
       fetchPreviousMessages();
-
+    }else {
+      setIsRefetched(false); 
     }
     setShowGroupSettings(prev => !prev);
   };
@@ -130,8 +139,14 @@ const ChatBox = ({ selectedUser, onChatDeleted }) => {
   };
 
   const isGroupChat = selectedUser.type === 'group';
-  const headerTitle = isGroupChat ? selectedUser.name : selectedUser.fullName;
-  const headerSubtitle = isGroupChat ? `${selectedUser.participants.length} members` : 'online';
+  const headerTitle = isGroupChat
+  ? (isRefetched ? fetchSelectedUser?.name : selectedUser.name)
+  : (isRefetched ? fetchSelectedUser?.fullName : selectedUser.fullName);
+
+const headerSubtitle = isGroupChat
+  ? (isRefetched ? `${fetchSelectedUser?.participants.length} members` : `${selectedUser.participants.length} members`)
+  : 'online';
+
 
   return (
     <div className="w-full h-screen bg-chatBg p-4 flex">
