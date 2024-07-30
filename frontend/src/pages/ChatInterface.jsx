@@ -1,6 +1,6 @@
 // ChatInterface.jsx
 
-import React, { useState } from 'react';
+import React, { useState , useCallback } from 'react';
 import Sidebar from "../components/sidebar/SideBar.jsx";
 import WorkArea from "../components/chat/WorkArea.jsx";
 import ChatBox from "../components/chat/ChatBox.jsx";

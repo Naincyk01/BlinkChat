@@ -24,12 +24,32 @@ const ChatBox = ({ selectedUser, onChatDeleted }) => {
   const [messages, setMessages] = useState([]);
   const [currentMessage, setCurrentMessage] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
+  const [fetchSelectedUser, setfetchSelectedUser] = useState(null);
   const socketRef = useRef(null);
   const [showPopup, setShowPopup] = useState(false);
   const [showGroupSettings, setShowGroupSettings] = useState(false);
 
+  const fetchSelectedUserGroup = async () => {
+    try {
+      const response = await axios.get(`/groups/group/${selectedUser._id}`);
+      const { data } = response.data;
+      setfetchSelectedUser(data); // Assuming you have a state setter for selectedUser
+    } catch (error) {
+      console.error('Error fetching selected user:', error);
+    }
+  };
 
-  console.log(selectedUser)
+
+  const fetchPreviousMessages = async () => {
+    try {
+      const response = await axios.get(`/messages/${selectedUser._id}`);
+      const { data } = response.data;
+      setMessages(data);
+    } catch (error) {
+      console.error('Error fetching previous messages:', error);
+    }
+  };
+
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
@@ -44,20 +64,8 @@ const ChatBox = ({ selectedUser, onChatDeleted }) => {
   }, []);
 
   useEffect(() => {
-    const fetchPreviousMessages = async () => {
-      try {
-        const response = await axios.get(`/messages/${selectedUser._id}`);
-        const { data } = response.data;
-        setMessages(data);
-      } catch (error) {
-        console.error('Error fetching previous messages:', error);
-      }
-    };
-
-    // Fetch previous messages when selectedUser changes
-    if (selectedUser._id) {
-      fetchPreviousMessages();
-    }
+    if (!selectedUser._id) return;
+    fetchPreviousMessages();
     // Socket connection setup
     socketRef.current = io('http://localhost:9000');
     socketRef.current.on('connect', () => {
@@ -104,6 +112,11 @@ const ChatBox = ({ selectedUser, onChatDeleted }) => {
   };
 
   const handleGroupSettingsToggle = () => {
+    if (showGroupSettings) {
+      fetchSelectedUserGroup(); 
+      fetchPreviousMessages();
+
+    }
     setShowGroupSettings(prev => !prev);
   };
 
