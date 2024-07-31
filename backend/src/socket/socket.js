@@ -33,7 +33,7 @@ io.on('connection', socket => {
   socket.on('message', message => {
     const { room } = activeUsers[socket.id] || {};
     if (room) {
-      io.to(room).emit('message', message);
+      socket.to(room).emit('message', message);
     }
   });
 

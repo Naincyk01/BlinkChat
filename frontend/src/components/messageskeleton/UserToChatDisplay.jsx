@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from '../../axiosInstance.jsx';
+import { LiaCheckDoubleSolid } from "react-icons/lia";
 import io from 'socket.io-client';
 
 const UserToChatDisplay = ({ user, onClick,isGroup }) => {
@@ -7,47 +8,28 @@ const UserToChatDisplay = ({ user, onClick,isGroup }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+
   const latestMessageId = user.latestMessage;
 
-  useEffect(() => {
-    const fetchLatestMessage = async () => {
-      if (!latestMessageId) {
-        setLoading(false);
-        return;
-      }
+  const fetchLatestMessage = async () => {
+    if (!latestMessageId) {
+      setLoading(false);
+      return;
+    }
 
-      try {
-        const response = await axios.get(`/messages/message/${latestMessageId}`);
-        setLatestMessage(response.data.data || {});
-      } catch (err) {
-        setError('Error fetching message');
-        console.error('Error fetching latest message:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    try {
+      const response = await axios.get(`/messages/message/${latestMessageId}`);
+      setLatestMessage(response.data.data || {});
+    } catch (err) {
+      setError('Error fetching message');
+      console.error('Error fetching latest message:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchLatestMessage();
   }, [latestMessageId]);
-
-  useEffect(() => {
-    const socket = io('http://localhost:9000');
-
-    socket.on('connect', () => {
-      if (user._id) {
-        socket.emit('joinRoom', user._id);
-      }
-    });
-
-    socket.on('message', (message) => {
-      if ((message.groupId === user._id) ) {
-        setLatestMessage(message);
-      }
-    });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, [user._id]);
 
   const truncateMessage = (message, maxLength) => {
     if (!message || message.length <= maxLength) {
@@ -99,12 +81,16 @@ const UserToChatDisplay = ({ user, onClick,isGroup }) => {
         </div>
       </div>
       <div className="flex flex-col gap-y-2">
-        <div className='text-xs text-gray-500 flex justify-end'>
-          {formatTimestamp(createdAt)}
-        </div>
-        <div className="text-xs text-gray-500 flex justify-end">
-          ✅
-        </div>
+      {latestMessage && (
+          <>
+            <div className='text-xs text-gray-500 flex justify-end'>
+              {formatTimestamp(createdAt)}
+            </div>
+            <div className="text-xs text-gray-500 flex justify-end">
+              <LiaCheckDoubleSolid />
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import SingleMessage from '../messageskeleton/SingleMessage.jsx';
 import { CiMenuKebab } from 'react-icons/ci';
 import GroupSetting from './GroupSetting.jsx';
 import { FaEye } from 'react-icons/fa';
+import { useChatContext } from '../../context/ChatContext.jsx';
 
 const PopupMenu = ({ onDeleteGroup, isGroupChat }) => {
   return (
@@ -19,6 +20,7 @@ const PopupMenu = ({ onDeleteGroup, isGroupChat }) => {
 };
 
 const ChatBox = ({ selectedUser, onChatDeleted }) => {
+  const {refetchData } = useChatContext();
   const [messages, setMessages] = useState([]);
   const [currentMessage, setCurrentMessage] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
@@ -28,6 +30,7 @@ const ChatBox = ({ selectedUser, onChatDeleted }) => {
   const [isRefetched, setIsRefetched] = useState(false);
   const [showGroupSettings, setShowGroupSettings] = useState(false);
   const [userStatus, setUserStatus] = useState({});
+  
 
   const fetchSelectedUserGroup = async () => {
     try {
@@ -79,6 +82,7 @@ const ChatBox = ({ selectedUser, onChatDeleted }) => {
       socketRef.current.on('message', message => {
         if (message.groupId === selectedUser._id) {
           setMessages(prevMessages => [...prevMessages, message]);
+          refetchData();
         }
     });
     socketRef.current.on('statusUpdate', ({ socketId, status }) => {
@@ -124,6 +128,7 @@ const ChatBox = ({ selectedUser, onChatDeleted }) => {
       const newMessage = response.data.data;
       socketRef.current.emit('message', newMessage);
       setMessages([...messages, newMessage]);
+      refetchData();
       setCurrentMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
