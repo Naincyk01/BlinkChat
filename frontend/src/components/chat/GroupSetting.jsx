@@ -58,8 +58,8 @@ const GroupSetting = ({ group, onClose }) => {
       for (const userId of selectedParticipants) {
         await axios.put(`/groups/${group._id}/participants`, {participants : userId });
       }
-      setSelectedParticipants([]); // Clear the selected participants list
       setSearchQuery(''); // Clear search query
+      setSelectedParticipants([]); // Clear the selected participants list
       // Re-fetch participants after adding
       const response = await axios.get(`/groups/${group._id}/participants`);
       setParticipants(response.data.data);

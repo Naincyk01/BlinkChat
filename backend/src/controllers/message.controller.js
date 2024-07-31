@@ -115,7 +115,6 @@ await cleanDeletedMessagesByGroupId(groupId);
 
   return res.status(201).json(new apiResponse(201, responseData, 'Message sent successfully'));
 });
-
 const getMessages = asyncHandler(async (req, res) => {
   const { groupId } = req.params;
   const userId = req.user._id; 
@@ -175,7 +174,6 @@ const deleteMessage = asyncHandler(async (req, res) => {
   return res.status(200).json(new apiResponse(200, {}, "Message deleted successfully"));
 });
 
-
 const updateMessage = asyncHandler(async (req, res) => {
     const { messageId } = req.params;
     const { content, type } = req.body;
@@ -218,7 +216,6 @@ const markMessageAsRead = asyncHandler(async (req, res) => {
 
     return res.status(200).json(new apiResponse(200, message, "Message marked as read"));
 });
-
 const getUnreadMessagesCount = asyncHandler(async (req, res) => {
     const userId = req.user._id;
 
@@ -227,6 +224,7 @@ const getUnreadMessagesCount = asyncHandler(async (req, res) => {
 
     return res.status(200).json(new apiResponse(200, { unreadCount }, "Unread messages count retrieved"));
 });
+
 
 
 const getMessageByMessageId = asyncHandler(async (req, res) => {

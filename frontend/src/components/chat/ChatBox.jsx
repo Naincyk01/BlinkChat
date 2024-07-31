@@ -6,14 +6,12 @@ import { CiMenuKebab } from 'react-icons/ci';
 import GroupSetting from './GroupSetting.jsx';
 import { FaEye } from 'react-icons/fa';
 
-
 const PopupMenu = ({ onDeleteGroup, isGroupChat }) => {
   return (
     <div className="absolute right-8 top-20 bg-primary border border-gray-600 rounded-lg shadow-lg z-10">
       <button
         onClick={onDeleteGroup}
-        className="block px-4 py-2 text-white rounded-lg hover:bg-gray-700 w-full text-left"
-      >
+        className="block px-4 py-2 text-white rounded-lg hover:bg-gray-700 w-full text-left" >
         {isGroupChat ? 'Delete Group' : 'Delete'}
       </button>
     </div>
@@ -29,6 +27,7 @@ const ChatBox = ({ selectedUser, onChatDeleted }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [isRefetched, setIsRefetched] = useState(false);
   const [showGroupSettings, setShowGroupSettings] = useState(false);
+  const [userStatus, setUserStatus] = useState({});
 
   const fetchSelectedUserGroup = async () => {
     try {
@@ -65,33 +64,53 @@ const ChatBox = ({ selectedUser, onChatDeleted }) => {
     fetchCurrentUser();
   }, []);
 
+
+
   useEffect(() => {
     if (!selectedUser._id) return;
     fetchPreviousMessages();
-    // Socket connection setup
+ 
     socketRef.current = io('http://localhost:9000');
     socketRef.current.on('connect', () => {
-      console.log('connected', socketRef.current.id);
       if (selectedUser._id) {
-        socketRef.current.emit('joinRoom', selectedUser._id);
+        socketRef.current.emit('joinRoom', { room: selectedUser._id });
       }
+    });
       socketRef.current.on('message', message => {
         if (message.groupId === selectedUser._id) {
           setMessages(prevMessages => [...prevMessages, message]);
         }
-      });
     });
+    socketRef.current.on('statusUpdate', ({ socketId, status }) => {
+      setUserStatus(prevStatus => ({
+        ...prevStatus,
+        [socketId]: status,
+      }));
+    });
+
+    socketRef.current.on('currentStatuses', statuses => {
+      const statusMap = {};
+      statuses.forEach(({ socketId, status }) => {
+        statusMap[socketId] = status;
+      });
+      setUserStatus(statusMap);
+    });
+
+    
     // Clean up socket connection
     return () => {
       socketRef.current.disconnect();
     };
   }, [selectedUser._id]);
 
+
   useEffect(() => {
     // Reset fetchSelectedUser and isRefetched when selectedUser changes
     setfetchSelectedUser(null);
     setIsRefetched(false);
   }, [selectedUser._id]);
+
+
   
   const sendMessage = async () => {
     if (!currentMessage.trim()) return; // Do not send empty messages
@@ -143,9 +162,9 @@ const ChatBox = ({ selectedUser, onChatDeleted }) => {
   ? (isRefetched ? fetchSelectedUser?.name : selectedUser.name)
   : (isRefetched ? fetchSelectedUser?.fullName : selectedUser.fullName);
 
-const headerSubtitle = isGroupChat
+ const headerSubtitle = isGroupChat
   ? (isRefetched ? `${fetchSelectedUser?.participants.length} members` : `${selectedUser.participants.length} members`)
-  : 'online';
+  : (Object.values(userStatus).includes('online') ? 'Online' : 'Offline');
 
 
   return (

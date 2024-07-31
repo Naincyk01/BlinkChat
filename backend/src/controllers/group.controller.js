@@ -227,9 +227,6 @@ const getParticipantsDetails = asyncHandler(async (req, res) => {
     // Return the participant details along with IDs
     res.status(200).json(new apiResponse(200, participants, "Participants retrieved successfully"));
 });
-
-
-
 const addParticipants = asyncHandler(async (req, res) => {
     const { groupId } = req.params;
     const { participants } = req.body; // participants is expected to be an array even if single participant
@@ -262,6 +259,16 @@ const addParticipants = asyncHandler(async (req, res) => {
 
     return res.status(200).json(new apiResponse(200, group, "Participants added successfully"));
 });
+const getGroupDetailsById = asyncHandler(async (req, res) => {
+    const { groupId } = req.params;
+
+    const group = await Group.findById(groupId);
+
+    if (!group) {
+        throw new apiError(404, "Group not found");
+    }
+    res.status(200).json(new apiResponse(200, group, "Group details retrieved successfully"));
+});
 const removeParticipant = asyncHandler(async (req, res) => {
   
     const { groupId, participantId } = req.params;
@@ -284,27 +291,6 @@ const removeParticipant = asyncHandler(async (req, res) => {
 
     return res.status(200).json(new apiResponse(200, group, "Participant removed successfully"));
 
-});
-const leaveGroup = asyncHandler(async (req, res) => {
-    const { groupId } = req.params;
-    const userId = req.user._id; 
-
-    const group = await Group.findById(groupId);
-
-    if (!group) {
-        throw new apiError(404, "Group not found");
-    }
-
-    // Check if the user is the admin of the group (admins cannot leave their own group)
-    if (group.admin.toString() === userId.toString()) {
-        throw new apiError(403, "Admins cannot leave their own group");
-    }
-
-    // Remove the user from the participants array
-    group.participants = group.participants.filter(id => id.toString() !== userId.toString());
-    await group.save();
-
-    return res.status(200).json(new apiResponse(200, group, "Left the group successfully"));
 });
 const updateGroup = asyncHandler(async (req, res) => {
     const { groupId } = req.params;
@@ -330,18 +316,27 @@ const updateGroup = asyncHandler(async (req, res) => {
 });
 
 
-
-const getGroupDetailsById = asyncHandler(async (req, res) => {
+const leaveGroup = asyncHandler(async (req, res) => {
     const { groupId } = req.params;
+    const userId = req.user._id; 
 
     const group = await Group.findById(groupId);
 
     if (!group) {
         throw new apiError(404, "Group not found");
     }
-    res.status(200).json(new apiResponse(200, group, "Group details retrieved successfully"));
-});
 
+    // Check if the user is the admin of the group (admins cannot leave their own group)
+    if (group.admin.toString() === userId.toString()) {
+        throw new apiError(403, "Admins cannot leave their own group");
+    }
+
+    // Remove the user from the participants array
+    group.participants = group.participants.filter(id => id.toString() !== userId.toString());
+    await group.save();
+
+    return res.status(200).json(new apiResponse(200, group, "Left the group successfully"));
+});
 
 export {
     createOneToOneConversation,

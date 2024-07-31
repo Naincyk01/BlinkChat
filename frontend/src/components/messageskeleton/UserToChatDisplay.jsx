@@ -33,7 +33,6 @@ const UserToChatDisplay = ({ user, onClick,isGroup }) => {
     const socket = io('http://localhost:9000');
 
     socket.on('connect', () => {
-  
       if (user._id) {
         socket.emit('joinRoom', user._id);
       }
@@ -41,7 +40,6 @@ const UserToChatDisplay = ({ user, onClick,isGroup }) => {
 
     socket.on('message', (message) => {
       if ((message.groupId === user._id) ) {
-        // Update the latest message
         setLatestMessage(message);
       }
     });
