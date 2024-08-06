@@ -28,7 +28,9 @@ const Login = () => {
 
     try {
       const response = await axios.post('/users/login', formData);
-      console.log('Login successful:', response.data);
+      console.log('Login successful:', response.data.data);
+      localStorage.setItem('accessToken', response.data.data.accessToken)
+      localStorage.setItem('refreshToken', response.data.data.refreshToken)
       navigate('/chatinterface');
     } catch (error) {
       console.error('Login failed:', error);

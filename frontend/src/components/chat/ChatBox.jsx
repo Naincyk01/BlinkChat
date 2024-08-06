@@ -73,7 +73,7 @@ const ChatBox = ({ selectedUser, onChatDeleted }) => {
     if (!selectedUser._id) return;
     fetchPreviousMessages();
  
-    socketRef.current = io('http://localhost:9000');
+    socketRef.current = io('https://blinkchat-8wly.onrender.com');
     socketRef.current.on('connect', () => {
       if (selectedUser._id) {
         socketRef.current.emit('joinRoom', { room: selectedUser._id });

@@ -35,6 +35,8 @@ const SidebarContent = () => {
   const handleLogout = async () => {
     try {
       await axios.post('/users/logout');
+      localStorage.setItem('accessToken', '')
+      localStorage.setItem('refreshToken', '')
       setCurrentUser(null);
       setProfilePic(Profile);
       navigate('/');
