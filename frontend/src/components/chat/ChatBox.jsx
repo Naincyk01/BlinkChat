@@ -12,7 +12,8 @@ const PopupMenu = ({ onDeleteGroup, isGroupChat }) => {
     <div className="absolute right-8 top-20 bg-primary border border-gray-600 rounded-lg shadow-lg z-10">
       <button
         onClick={onDeleteGroup}
-        className="block px-4 py-2 text-white rounded-lg hover:bg-gray-700 w-full text-left" >
+        className="block px-4 py-2 text-white rounded-lg hover:bg-gray-700 w-full text-left"
+      >
         {isGroupChat ? 'Delete Group' : 'Delete'}
       </button>
     </div>
@@ -20,7 +21,7 @@ const PopupMenu = ({ onDeleteGroup, isGroupChat }) => {
 };
 
 const ChatBox = ({ selectedUser, onChatDeleted }) => {
-  const {refetchData } = useChatContext();
+  const { refetchData } = useChatContext();
   const [messages, setMessages] = useState([]);
   const [currentMessage, setCurrentMessage] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
@@ -30,19 +31,17 @@ const ChatBox = ({ selectedUser, onChatDeleted }) => {
   const [isRefetched, setIsRefetched] = useState(false);
   const [showGroupSettings, setShowGroupSettings] = useState(false);
   const [userStatus, setUserStatus] = useState({});
-  
 
   const fetchSelectedUserGroup = async () => {
     try {
       const response = await axios.get(`/groups/group/${selectedUser._id}`);
       const { data } = response.data;
       setfetchSelectedUser(data);
-      setIsRefetched(true); 
+      setIsRefetched(true);
     } catch (error) {
       console.error('Error fetching selected user:', error);
     }
   };
-
 
   const fetchPreviousMessages = async () => {
     try {
@@ -67,23 +66,21 @@ const ChatBox = ({ selectedUser, onChatDeleted }) => {
     fetchCurrentUser();
   }, []);
 
-
-
   useEffect(() => {
     if (!selectedUser._id) return;
     fetchPreviousMessages();
- 
+
     socketRef.current = io('https://blinkchat-8wly.onrender.com');
     socketRef.current.on('connect', () => {
       if (selectedUser._id) {
         socketRef.current.emit('joinRoom', { room: selectedUser._id });
       }
     });
-      socketRef.current.on('message', message => {
-        if (message.groupId === selectedUser._id) {
-          setMessages(prevMessages => [...prevMessages, message]);
-          refetchData();
-        }
+    socketRef.current.on('message', message => {
+      if (message.groupId === selectedUser._id) {
+        setMessages(prevMessages => [...prevMessages, message]);
+        refetchData();
+      }
     });
     socketRef.current.on('statusUpdate', ({ socketId, status }) => {
       setUserStatus(prevStatus => ({
@@ -100,13 +97,11 @@ const ChatBox = ({ selectedUser, onChatDeleted }) => {
       setUserStatus(statusMap);
     });
 
-    
     // Clean up socket connection
     return () => {
       socketRef.current.disconnect();
     };
   }, [selectedUser._id]);
-
 
   useEffect(() => {
     // Reset fetchSelectedUser and isRefetched when selectedUser changes
@@ -114,8 +109,6 @@ const ChatBox = ({ selectedUser, onChatDeleted }) => {
     setIsRefetched(false);
   }, [selectedUser._id]);
 
-
-  
   const sendMessage = async () => {
     if (!currentMessage.trim()) return; // Do not send empty messages
     try {
@@ -145,10 +138,10 @@ const ChatBox = ({ selectedUser, onChatDeleted }) => {
 
   const handleGroupSettingsToggle = () => {
     if (showGroupSettings) {
-      fetchSelectedUserGroup(); 
+      fetchSelectedUserGroup();
       fetchPreviousMessages();
-    }else {
-      setIsRefetched(false); 
+    } else {
+      setIsRefetched(false);
     }
     setShowGroupSettings(prev => !prev);
   };
@@ -156,7 +149,7 @@ const ChatBox = ({ selectedUser, onChatDeleted }) => {
   const handleDeleteGroup = async () => {
     try {
       await axios.delete(`/groups/${selectedUser._id}`); // API call to delete group
-      onChatDeleted();// Notify parent about deletion
+      onChatDeleted(); // Notify parent about deletion
     } catch (error) {
       console.error('Error deleting group:', error);
     }
@@ -164,13 +157,20 @@ const ChatBox = ({ selectedUser, onChatDeleted }) => {
 
   const isGroupChat = selectedUser.type === 'group';
   const headerTitle = isGroupChat
-  ? (isRefetched ? fetchSelectedUser?.name : selectedUser.name)
-  : (isRefetched ? fetchSelectedUser?.fullName : selectedUser.fullName);
+    ? isRefetched
+      ? fetchSelectedUser?.name
+      : selectedUser.name
+    : isRefetched
+      ? fetchSelectedUser?.fullName
+      : selectedUser.fullName;
 
- const headerSubtitle = isGroupChat
-  ? (isRefetched ? `${fetchSelectedUser?.participants.length} members` : `${selectedUser.participants.length} members`)
-  : (Object.values(userStatus).includes('online') ? 'Online' : 'Offline');
-
+  const headerSubtitle = isGroupChat
+    ? isRefetched
+      ? `${fetchSelectedUser?.participants.length} members`
+      : `${selectedUser.participants.length} members`
+    : Object.values(userStatus).includes('online')
+      ? 'Online'
+      : 'Offline';
 
   return (
     <div className="w-full h-screen bg-chatBg p-4 flex">

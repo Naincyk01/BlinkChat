@@ -10,31 +10,25 @@ import {
   updateGroup,
   leaveGroup,
   getParticipantsDetails,
-  getGroupDetailsById
+  getGroupDetailsById,
 } from '../controllers/group.controller.js';
-import { verifyJWT } from '../middlewares/auth.middleware.js'; 
+import { verifyJWT } from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
-
 router.use(verifyJWT);
 
-
-router.post('/one',  createOneToOneConversation);
-router.post('/group',  createGroupConversation);
+router.post('/one', createOneToOneConversation);
+router.post('/group', createGroupConversation);
 router.delete('/:groupId', deleteGroup);
 router.get('/:groupId/participants', getParticipantsDetails);
-router.get('/findone', findOneByUser );
-router.get('/findgroup',getGroupConversations);
+router.get('/findone', findOneByUser);
+router.get('/findgroup', getGroupConversations);
 router.get('/group/:groupId', getGroupDetailsById);
 
 router.put('/:groupId', updateGroup);
 router.put('/:groupId/participants', addParticipants);
 router.delete('/:groupId/participants/:participantId', removeParticipant);
 router.delete('/:groupId/leave', leaveGroup);
-
-
-
-
 
 export default router;

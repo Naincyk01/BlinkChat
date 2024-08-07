@@ -1,36 +1,37 @@
 import React, { useState } from 'react';
 import loginBackground from '../assets/bglogin.png';
-import axios from "../axiosInstance.jsx"; 
-import { buttonHoverAnimaiton } from '../utils/TailwindUtlis.jsx'; 
+import axios from '../axiosInstance.jsx';
+import { buttonHoverAnimaiton } from '../utils/TailwindUtlis.jsx';
 import { Link, useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
   });
-  const [error, setError] = useState(null); 
+  const [error, setError] = useState(null);
 
-  const inputContainerStyles = "flex flex-col gap-2 w-full";
-  const inputStyles = "w-full h-8 rounded-md px-4 text-black text-sm border-2 border-[#BCBEC0] focus:border-primaryDark focus:outline-none";
+  const inputContainerStyles = 'flex flex-col gap-2 w-full';
+  const inputStyles =
+    'w-full h-8 rounded-md px-4 text-black text-sm border-2 border-[#BCBEC0] focus:border-primaryDark focus:outline-none';
 
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value } = e.target;
     setFormData(prevState => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
 
     try {
       const response = await axios.post('/users/login', formData);
       console.log('Login successful:', response.data.data);
-      localStorage.setItem('accessToken', response.data.data.accessToken)
-      localStorage.setItem('refreshToken', response.data.data.refreshToken)
+      localStorage.setItem('accessToken', response.data.data.accessToken);
+      localStorage.setItem('refreshToken', response.data.data.refreshToken);
       navigate('/chatinterface');
     } catch (error) {
       console.error('Login failed:', error);
@@ -50,12 +51,11 @@ const Login = () => {
           </span>
         </button>
 
-        <div className='flex flex-col w-full gap-6'>
+        <div className="flex flex-col w-full gap-6">
+          <div className="text-2xl font-bold text-white">Login to your account</div>
 
-          <div className='text-2xl font-bold text-white'>Login to your account</div>
-
-          <form className='flex flex-col gap-6' onSubmit={handleSubmit}>
-            <div className='flex flex-col gap-3 items-start w-full'>
+          <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+            <div className="flex flex-col gap-3 items-start w-full">
               <div className={`${inputContainerStyles}`}>
                 <label className="capitalize">Email</label>
                 <input
@@ -78,15 +78,23 @@ const Login = () => {
                   onChange={handleInputChange}
                 />
               </div>
-              <button type="button" className='capitalize'>Forgot Password?</button>
+              <button type="button" className="capitalize">
+                Forgot Password?
+              </button>
             </div>
-            <button type="submit" className={`flex justify-center items-center text-lg font-bold bg-primary py-2 rounded-lg ${buttonHoverAnimaiton} hover:-translate-y-2 hover:bg-primaryDark`}>
+            <button
+              type="submit"
+              className={`flex justify-center items-center text-lg font-bold bg-primary py-2 rounded-lg ${buttonHoverAnimaiton} hover:-translate-y-2 hover:bg-primaryDark`}
+            >
               Login
             </button>
             {error && <p className="text-red-500 text-sm">{error}</p>}
           </form>
           <span className="text-xs text-center font-light">
-            Don't Have An Account yet? <Link to='/signup' className="font-bold">Sign Up</Link>
+            Don't Have An Account yet?{' '}
+            <Link to="/signup" className="font-bold">
+              Sign Up
+            </Link>
           </span>
         </div>
       </div>
