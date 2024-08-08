@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema } from 'mongoose';
 const messageSchema = new Schema(
   {
     groupId: {
@@ -25,10 +25,10 @@ const messageSchema = new Schema(
       default: false,
     },
     file: {
-      type: String  // URL or path to the file (if messageType is 'file', 'image', etc.)
-    }
+      type: String, // URL or path to the file (if messageType is 'file', 'image', etc.)
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Message = mongoose.model('Message', messageSchema);

@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema } from 'mongoose';
 
 const groupSchema = new Schema(
   {
@@ -10,10 +10,12 @@ const groupSchema = new Schema(
       enum: ['one_to_one', 'group'],
       required: true,
     },
-    participants: [{
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-    }],
+    participants: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
     admin: {
       type: Schema.Types.ObjectId,
       ref: 'User',
@@ -23,12 +25,14 @@ const groupSchema = new Schema(
       ref: 'Message',
       default: null,
     },
-    messages: [{
-      type: Schema.Types.ObjectId,
-      ref: 'Message',
-    }],
+    messages: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Message',
+      },
+    ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Group = mongoose.model('Group', groupSchema);
