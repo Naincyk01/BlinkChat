@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import axios from '../../axiosInstance.jsx'; 
+import axios from '../../axiosInstance.jsx';
 import { IoClose } from 'react-icons/io5';
 
 const UserSearchCreate = ({ onClose, onChatCreated }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
 
-  const handleSearchChange = async (event) => {
+  const handleSearchChange = async event => {
     const query = event.target.value;
     setSearchQuery(query);
 
@@ -22,20 +22,24 @@ const UserSearchCreate = ({ onClose, onChatCreated }) => {
     }
   };
 
-  const handleUserClick = async (user) => {
+  const handleUserClick = async user => {
     try {
-      const response = await axios.post('/groups/one', { participant:user.username});
-        onChatCreated(); // Notify parent component about the successful creation
+      const response = await axios.post('/groups/one', { participant: user.username });
+      onChatCreated(); // Notify parent component about the successful creation
     } catch (error) {
       console.error('Error creating chat:', error);
     }
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50" onClick={onClose}>
-
-      <div className="text-white p-4 rounded-lg shadow-lg w-1/3 max-w-lg border border-gray-400 flex flex-col gap-4 bg-primaryLight"   onClick={(e) => e.stopPropagation()}> 
-
+    <div
+      className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
+      onClick={onClose}
+    >
+      <div
+        className="text-white p-4 rounded-lg shadow-lg w-1/3 max-w-lg border border-gray-400 flex flex-col gap-4 bg-primaryLight"
+        onClick={e => e.stopPropagation()}
+      >
         <div className="flex justify-between items-center">
           <h2 className="text-lg font-semibold">Search Users</h2>
           <IoClose className="cursor-pointer" size={24} onClick={onClose} />
@@ -64,9 +68,7 @@ const UserSearchCreate = ({ onClose, onChatCreated }) => {
             <p>No users found.</p>
           )}
         </div>
-
       </div>
-
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../../axiosInstance.jsx';
-import { IoClose } from "react-icons/io5";
+import { IoClose } from 'react-icons/io5';
 import { useChatContext } from '../../context/ChatContext.jsx';
 
 const GroupSetting = ({ group, onClose }) => {
@@ -56,7 +56,7 @@ const GroupSetting = ({ group, onClose }) => {
   const handleAddParticipants = async () => {
     try {
       for (const userId of selectedParticipants) {
-        await axios.put(`/groups/${group._id}/participants`, {participants : userId });
+        await axios.put(`/groups/${group._id}/participants`, { participants: userId });
       }
       setSearchQuery(''); // Clear search query
       setSelectedParticipants([]); // Clear the selected participants list
@@ -70,7 +70,7 @@ const GroupSetting = ({ group, onClose }) => {
     }
   };
 
-  const handleRemoveParticipant = async (userId) => {
+  const handleRemoveParticipant = async userId => {
     try {
       await axios.delete(`/groups/${group._id}/participants/${userId}`);
       setParticipants(participants.filter(participant => participant._id !== userId));
@@ -92,7 +92,7 @@ const GroupSetting = ({ group, onClose }) => {
     }
   };
 
-  const handleSelectParticipant = (user) => {
+  const handleSelectParticipant = user => {
     if (!selectedParticipants.includes(user._id)) {
       setSelectedParticipants([...selectedParticipants, user._id]);
     }
@@ -104,7 +104,7 @@ const GroupSetting = ({ group, onClose }) => {
     }
   };
 
-  const handleKeyDown = (event) => {
+  const handleKeyDown = event => {
     if (event.key === 'Enter') {
       handleUpdateGroupName();
     }
@@ -117,7 +117,7 @@ const GroupSetting = ({ group, onClose }) => {
           <IoClose />
         </button>
         <h3 className="text-xl font-semibold mb-2">Group Settings</h3>
-        
+
         <div className="mb-2">
           <h4 className="text-lg font-medium mb-2">Participants</h4>
           <div className="flex gap-x-4">
@@ -127,22 +127,27 @@ const GroupSetting = ({ group, onClose }) => {
                 className="flex items-center border text-black border-gray-300 rounded-md p-1 bg-yellow-100"
               >
                 <span>{participant.fullName}</span>
-                <button className="text-red-500 ml-2" onClick={() => handleRemoveParticipant(participant._id)}>
+                <button
+                  className="text-red-500 ml-2"
+                  onClick={() => handleRemoveParticipant(participant._id)}
+                >
                   &#10005; {/* Cross icon */}
                 </button>
               </div>
             ))}
             {selectedParticipants.length > 0 && (
               <div className=" border-gray-300">
-                {searchResults.filter(user => selectedParticipants.includes(user._id)).map(user => (
-                  <div
-                    key={user._id}
-                    className="flex items-center border bg-green-200 text-black rounded-md p-1 border-gray-300"
-                  >
-                    <span>{user.fullName}</span>
-                    <button className='text-red-500'> &#10005;</button>
-                  </div>
-                ))}
+                {searchResults
+                  .filter(user => selectedParticipants.includes(user._id))
+                  .map(user => (
+                    <div
+                      key={user._id}
+                      className="flex items-center border bg-green-200 text-black rounded-md p-1 border-gray-300"
+                    >
+                      <span>{user.fullName}</span>
+                      <button className="text-red-500"> &#10005;</button>
+                    </div>
+                  ))}
               </div>
             )}
           </div>
@@ -153,7 +158,7 @@ const GroupSetting = ({ group, onClose }) => {
             placeholder="Update group name"
             className="border p-2 rounded-md w-full text-gray-700"
             value={newGroupName}
-            onChange={(e) => setNewGroupName(e.target.value)}
+            onChange={e => setNewGroupName(e.target.value)}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
           />
@@ -170,12 +175,16 @@ const GroupSetting = ({ group, onClose }) => {
             placeholder="Search users"
             className="border p-2 rounded w-full text-black"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={e => setSearchQuery(e.target.value)}
           />
           {searchResults.length > 0 && (
             <div className="rounded mt-2 text-black flex h-20 border border-[#BCBEC0] flex-col gap-y-2 overflow-y-auto scrollbar-hidden">
               {searchResults.map(user => (
-                <div key={user._id} className="flex flex-col p-2  border-b border-[#BCBEC0] cursor-pointer hover:bg-[#CDE1FD]" onClick={() => handleSelectParticipant(user)}>
+                <div
+                  key={user._id}
+                  className="flex flex-col p-2  border-b border-[#BCBEC0] cursor-pointer hover:bg-[#CDE1FD]"
+                  onClick={() => handleSelectParticipant(user)}
+                >
                   <p className="text-white">{user.username}</p>
                   <p className="text-gray-600 text-sm">{user.fullName}</p>
                 </div>
@@ -189,7 +198,10 @@ const GroupSetting = ({ group, onClose }) => {
         >
           Add Participants
         </button>
-        <button onClick={handleLeaveGroup} className="bg-red-500 text-white p-2 rounded w-full mt-2">
+        <button
+          onClick={handleLeaveGroup}
+          className="bg-red-500 text-white p-2 rounded w-full mt-2"
+        >
           Leave Group
         </button>
       </div>

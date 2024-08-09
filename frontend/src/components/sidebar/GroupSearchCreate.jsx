@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from '../../axiosInstance.jsx'; 
+import axios from '../../axiosInstance.jsx';
 import { IoClose } from 'react-icons/io5';
 import { IoRemoveCircleOutline } from 'react-icons/io5';
 
@@ -7,9 +7,9 @@ const GroupSearchCreate = ({ onClose, onGroupCreated }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
-  const [groupName, setGroupName] = useState(''); 
-  
-  const handleSearchChange = async (event) => {
+  const [groupName, setGroupName] = useState('');
+
+  const handleSearchChange = async event => {
     const query = event.target.value;
     setSearchQuery(query);
 
@@ -25,13 +25,13 @@ const GroupSearchCreate = ({ onClose, onGroupCreated }) => {
     }
   };
 
-  const handleUserClick = (user) => {
+  const handleUserClick = user => {
     if (!selectedUsers.some(selected => selected._id === user._id)) {
       setSelectedUsers([...selectedUsers, user]);
     }
   };
 
-  const handleRemoveUser = (userId) => {
+  const handleRemoveUser = userId => {
     setSelectedUsers(selectedUsers.filter(user => user._id !== userId));
   };
 
@@ -44,9 +44,9 @@ const GroupSearchCreate = ({ onClose, onGroupCreated }) => {
     const usernames = selectedUsers.map(user => user.username);
 
     try {
-      const response = await axios.post('/groups/group', { 
+      const response = await axios.post('/groups/group', {
         name: groupName,
-        participants: usernames 
+        participants: usernames,
       });
       onGroupCreated();
     } catch (error) {
@@ -55,9 +55,14 @@ const GroupSearchCreate = ({ onClose, onGroupCreated }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" onClick={onClose}>
-      <div className="bg-primaryLight text-white border border-gray-300 p-4 rounded-lg shadow-lg w-1/3 max-w-lg flex flex-col gap-5"  onClick={(e) => e.stopPropagation()}>
-
+    <div
+      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-primaryLight text-white border border-gray-300 p-4 rounded-lg shadow-lg w-1/3 max-w-lg flex flex-col gap-5"
+        onClick={e => e.stopPropagation()}
+      >
         <div className="flex justify-between items-center">
           <h2 className="text-lg font-semibold">Search Users to Create Group</h2>
           <IoClose className="cursor-pointer" size={24} onClick={onClose} />
@@ -113,7 +118,7 @@ const GroupSearchCreate = ({ onClose, onGroupCreated }) => {
             className="w-full h-8 rounded-md px-4 border border-[#BCBEC0] focus:border-gray-800 text-gray-700 focus:outline-none text-sm border-opacity-50"
             placeholder="Group name..."
             value={groupName}
-            onChange={(e) => setGroupName(e.target.value)}
+            onChange={e => setGroupName(e.target.value)}
           />
         </div>
         {selectedUsers.length > 0 && (
@@ -124,7 +129,6 @@ const GroupSearchCreate = ({ onClose, onGroupCreated }) => {
             Create Group
           </button>
         )}
-
       </div>
     </div>
   );

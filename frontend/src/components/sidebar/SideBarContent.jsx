@@ -8,7 +8,7 @@ import { GrLogout } from 'react-icons/gr';
 import { IoSettingsOutline } from 'react-icons/io5';
 import axios from '../../axiosInstance.jsx';
 import Profile from '../../assets/bglogin.png';
-import UserProfileModal from './UserProfileModal.jsx'; 
+import UserProfileModal from './UserProfileModal.jsx';
 
 const SidebarContent = () => {
   const navigate = useNavigate();
@@ -35,8 +35,8 @@ const SidebarContent = () => {
   const handleLogout = async () => {
     try {
       await axios.post('/users/logout');
-      localStorage.setItem('accessToken', '')
-      localStorage.setItem('refreshToken', '')
+      localStorage.setItem('accessToken', '');
+      localStorage.setItem('refreshToken', '');
       setCurrentUser(null);
       setProfilePic(Profile);
       navigate('/');
@@ -84,9 +84,7 @@ const SidebarContent = () => {
         <GrLogout size={38} />
       </div>
 
-      {isModalOpen && currentUser && (
-        <UserProfileModal user={currentUser} onClose={closeModal} />
-      )}
+      {isModalOpen && currentUser && <UserProfileModal user={currentUser} onClose={closeModal} />}
     </div>
   );
 };

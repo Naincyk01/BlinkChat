@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import axios from '../axiosInstance.jsx';
 
@@ -32,9 +31,7 @@ export const ChatProvider = ({ children }) => {
   }, [fetchUsers, fetchGroups]);
 
   return (
-    <ChatContext.Provider value={{ users, groups, refetchData }}>
-      {children}
-    </ChatContext.Provider>
+    <ChatContext.Provider value={{ users, groups, refetchData }}>{children}</ChatContext.Provider>
   );
 };
 

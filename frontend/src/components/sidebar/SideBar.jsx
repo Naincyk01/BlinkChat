@@ -30,11 +30,10 @@ const SideBar = ({ onUserClick }) => {
     }
   }, [searchQuery, searchType, users, groups]);
 
-   const handleSearchChange = event => {
+  const handleSearchChange = event => {
     const query = event.target.value;
     setSearchQuery(query);
   };
-
 
   const filterUsers = query => {
     if (!query) {
@@ -72,13 +71,13 @@ const SideBar = ({ onUserClick }) => {
 
   const handleChatCreated = () => {
     alert('Chat created successfully !');
-    refetchData(); 
+    refetchData();
     closePopup();
   };
 
   const handleGroupCreated = () => {
     alert('Group created successfully!');
-    refetchData(); 
+    refetchData();
     closePopup();
   };
 
@@ -107,7 +106,7 @@ const SideBar = ({ onUserClick }) => {
             onChange={handleSearchChange}
           />
           <div className="flex justify-between">
-            <div className='flex gap-x-2'>
+            <div className="flex gap-x-2">
               <button
                 onClick={() => handleSearchTypeChange('users')}
                 className={`px-4 text-sm py-1 rounded-xl ${searchType === 'users' ? 'bg-primary text-white' : 'bg-gray-200 text-primary'}`}

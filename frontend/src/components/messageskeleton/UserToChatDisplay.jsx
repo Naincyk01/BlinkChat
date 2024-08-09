@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from '../../axiosInstance.jsx';
-import { LiaCheckDoubleSolid } from "react-icons/lia";
+import { LiaCheckDoubleSolid } from 'react-icons/lia';
 import io from 'socket.io-client';
 
-const UserToChatDisplay = ({ user, onClick,isGroup }) => {
+const UserToChatDisplay = ({ user, onClick, isGroup }) => {
   const [latestMessage, setLatestMessage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
 
   const latestMessageId = user.latestMessage;
 
@@ -38,7 +37,7 @@ const UserToChatDisplay = ({ user, onClick,isGroup }) => {
     return `${message.substring(0, maxLength)}...`;
   };
 
-  const formatTimestamp = (timestamp) => {
+  const formatTimestamp = timestamp => {
     if (!timestamp) return '';
     const date = new Date(timestamp);
 
@@ -46,14 +45,14 @@ const UserToChatDisplay = ({ user, onClick,isGroup }) => {
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
     const year = date.getFullYear();
-    
+
     let hours = date.getHours();
     const minutes = String(date.getMinutes()).padStart(2, '0');
     const ampm = hours >= 12 ? 'PM' : 'AM';
-    
+
     hours = hours % 12;
     hours = hours ? String(hours).padStart(2, '0') : '12'; // '0' should be '12' for midnight
-    
+
     return `${day}/${month}/${year} ${hours}:${minutes} ${ampm}`;
   };
 
@@ -69,21 +68,23 @@ const UserToChatDisplay = ({ user, onClick,isGroup }) => {
       className="flex items-center justify-between h-full w-full py-2 mb-1 border-b border-[#C4C4C4] border-opacity-50"
       onClick={onClick}
     >
-      <div className='flex gap-x-3'>
+      <div className="flex gap-x-3">
         <div className="border h-14 rounded-full w-14 flex justify-center items-center">
-          <img src={isGroup ?"": user.profilepic} className="h-full w-full rounded-full" alt="picture" />
+          <img
+            src={isGroup ? '' : user.profilepic}
+            className="h-full w-full rounded-full"
+            alt="picture"
+          />
         </div>
         <div className="flex flex-col">
-        <h3 className="text-lg font-semibold">
-            {isGroup ? user.name : user.fullName}
-          </h3>
+          <h3 className="text-lg font-semibold">{isGroup ? user.name : user.fullName}</h3>
           <p className="text-sm text-gray-500">{truncatedContent}</p>
         </div>
       </div>
       <div className="flex flex-col gap-y-2">
-      {latestMessage && (
+        {latestMessage && (
           <>
-            <div className='text-xs text-gray-500 flex justify-end'>
+            <div className="text-xs text-gray-500 flex justify-end">
               {formatTimestamp(createdAt)}
             </div>
             <div className="text-xs text-gray-500 flex justify-end">
@@ -97,4 +98,3 @@ const UserToChatDisplay = ({ user, onClick,isGroup }) => {
 };
 
 export default UserToChatDisplay;
-

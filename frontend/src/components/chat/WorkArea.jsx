@@ -5,9 +5,8 @@ import Image1 from '../../assets/welcomeImage1.svg';
 import Image2 from '../../assets/welcomeImage2.svg';
 
 const WorkArea = () => {
-  const text = "Connect easily with your friends and family.......";
+  const text = 'Connect easily with your friends and family.......';
 
- 
   const image1Variants = {
     initial: { y: 0, opacity: 0 }, // Initial position and opacity
     animate: {
@@ -16,33 +15,32 @@ const WorkArea = () => {
       transition: {
         yoyo: Infinity, // Loop animation indefinitely
         duration: 2, // Animation duration
-        ease: "easeInOut" // Easing function
-      }
-    }
+        ease: 'easeInOut', // Easing function
+      },
+    },
   };
-
 
   const image2Variants = {
     initial: { y: 0, opacity: 0 },
     animate: {
-      y: 10, 
-      opacity: 1, 
+      y: 10,
+      opacity: 1,
       transition: {
-        yoyo: Infinity, 
-        duration: 2, 
-        ease: "easeInOut" 
-      }
-    }
+        yoyo: Infinity,
+        duration: 2,
+        ease: 'easeInOut',
+      },
+    },
   };
 
   const containerVariants = {
     hidden: {},
     visible: {
       transition: {
-        staggerChildren: 0.08, 
-        delayChildren: 1 
-      }
-    }
+        staggerChildren: 0.08,
+        delayChildren: 1,
+      },
+    },
   };
 
   const letterVariants = {
@@ -51,10 +49,10 @@ const WorkArea = () => {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.3, 
-        ease: 'easeOut' 
-      }
-    }
+        duration: 0.3,
+        ease: 'easeOut',
+      },
+    },
   };
 
   return (
@@ -90,9 +88,11 @@ const WorkArea = () => {
           animate="visible"
         >
           <div className="flex flex-wrap justify-center">
-            {text.split(" ").map((word, wordIndex) => (
-              <span key={wordIndex} className="mr-4"> {/* Add margin to space out words */}
-                {word.split("").map((char, charIndex) => (
+            {text.split(' ').map((word, wordIndex) => (
+              <span key={wordIndex} className="mr-4">
+                {' '}
+                {/* Add margin to space out words */}
+                {word.split('').map((char, charIndex) => (
                   <motion.span key={charIndex} variants={letterVariants}>
                     {char}
                   </motion.span>
@@ -101,7 +101,6 @@ const WorkArea = () => {
             ))}
           </div>
         </motion.div>
-
 
         <LuMessagesSquare className="" size={50} />
       </div>
