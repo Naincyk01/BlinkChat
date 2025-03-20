@@ -11,8 +11,11 @@ const SignUp = () => {
     email: '',
     password: '',
     bio: '',
-    profilepic: null  // New state for profile picture
+    profilepic: null,  // New state for profile picture
   });
+
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState(''); // 'success' or 'error'
 
   const inputContainerStyles = "flex flex-col gap-2 w-full";
   const inputStyles = "w-full h-8 rounded-md px-4 text-black text-sm border-2 border-[#BCBEC0] focus:border-primaryDark focus:outline-none";
@@ -21,7 +24,7 @@ const SignUp = () => {
     const { name, value } = e.target;
     setFormData(prevState => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -29,7 +32,7 @@ const SignUp = () => {
     const file = e.target.files[0];
     setFormData(prevState => ({
       ...prevState,
-      profilepic: file
+      profilepic: file,
     }));
   };
 
@@ -47,13 +50,23 @@ const SignUp = () => {
 
       const response = await axios.post('/users/register', formDataWithFile, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          'Content-Type': 'multipart/form-data',
+        },
       });
+
       console.log('Registration successful:', response.data);
+      setMessage('Registration successful!');
+      setMessageType('success');
     } catch (error) {
       console.error('Registration failed:', error);
+      setMessage('Registration failed. Please try again.');
+      setMessageType('error');
     }
+
+    // Hide the message after 3 seconds
+    setTimeout(() => {
+      setMessage('');
+    }, 2000);
   };
 
   return (
@@ -61,18 +74,19 @@ const SignUp = () => {
       className="flex justify-center items-center w-full h-screen bg-cover bg-center bg-no-repeat text-white"
       style={{ backgroundImage: `url(${loginBackground})` }}
     >
-      <div className="bg-gray-400 rounded-3xl w-[450px] h-auto flex flex-col justify-center items-center shadow-md bg-clip-padding backdrop-filter backdrop-blur-lg gap-3 p-4 px-rootXPadd bg-opacity-0 border border-primary">
+      <div className="bg-gray-400 rounded-3xl w-[450px] h-auto flex flex-col justify-center items-center shadow-md bg-clip-padding backdrop-filter backdrop-blur-lg gap-2 p-4 px-rootXPadd bg-opacity-0 border border-primary">
         <button className="font-bold mr-4 drop-shadow-lg text-logoFontSize">
           <span className="">
             Blink<span className="text-primary">Chat</span>
           </span>
         </button>
 
-        <div className='flex flex-col gap-4 w-full'>
-          <div className='text-2xl font-bold text-white'>Register</div>
+        <div className='flex flex-col gap-2 w-full'>
+          {/* <div className='text-xl font-bold text-white'>Register</div> */}
 
           <form className='flex flex-col gap-5' onSubmit={handleSubmit} encType="multipart/form-data">
-            <div className='flex flex-col gap-3 items-start w-full'>
+            <div className='flex flex-col gap-2 items-start w-full'>
+              {/* Form Inputs */}
               <div className={`${inputContainerStyles}`}>
                 <label className="capitalize">Full Name</label>
                 <input
@@ -139,10 +153,19 @@ const SignUp = () => {
                 />
               </div>
             </div>
-            <button type="submit" className={`flex justify-center items-center text-lg font-bold bg-primary py-2 rounded-lg ${buttonHoverAnimaiton} hover:-translate-y-2 hover:bg-primaryDark`}>
+
+            <button type="submit" className={`flex justify-center items-center text-lg font-bold bg-primary py-1 rounded-lg ${buttonHoverAnimaiton} hover:-translate-y-2 hover:bg-primaryDark`}>
               Sign up
             </button>
           </form>
+
+          {/* Display Success or Error Message */}
+          {message && (
+            <div className={`mt-4 p-3 text-center text-white ${messageType === 'success' ? 'bg-green-500' : 'bg-red-500'} rounded-md`}>
+              {message}
+            </div>
+          )}
+
           <span className="text-xs text-center font-light">
             Already have an account? <Link to='/' className="font-bold">Login</Link>
           </span>
